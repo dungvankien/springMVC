@@ -1,7 +1,7 @@
 package cg.wbd.grandemonstration.model;
 
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Table

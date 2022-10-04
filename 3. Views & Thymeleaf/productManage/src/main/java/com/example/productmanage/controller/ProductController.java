@@ -1,2 +1,4 @@
-package com.example.productmanage.controller;public class ProductController {
+package com.example.productmanage.controller;
+
+public class ProductController {
 }
