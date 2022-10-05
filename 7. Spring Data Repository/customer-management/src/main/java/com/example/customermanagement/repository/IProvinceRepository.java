@@ -1,2 +1,8 @@
-package com.example.customermanagement.repository;public interface IProvinceRepository {
+package com.example.customermanagement.repository;
+
+import com.example.customermanagement.model.Province;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+public interface IProvinceRepository extends PagingAndSortingRepository<Province, Long> {
+
 }
