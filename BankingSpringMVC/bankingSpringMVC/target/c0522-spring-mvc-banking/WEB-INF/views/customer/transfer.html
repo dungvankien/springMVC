@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer</title>
+    <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/all.min.css">
+    <style>
+        .row-head {
+            background-color: rgb(58, 116, 224);
+            color: white;
+            height: 100px;
+            padding: 20px;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .row>div>a {
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+        }
+
+        .button-head {
+            text-align: end;
+        }
+
+        .row-body {
+            margin-top: 20px;
+        }
+
+        .row-body>div>div {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row row-head">
+            <div class="col-8">
+                <h2>Transfer money Information</h2>
+            </div>
+            <div class="col-4 button-head">
+                <a href="/customers" type="button" class="btn btn-outline-light "><i class="fa-solid fa-bars"></i>
+                    List of customers</a>
+            </div>
+        </div>
+
+        <form th:action="@{/transfer-customer/__${customer.id}__}" th:object="${transfer}" method="post">
+            <div class="row row-body">
+                <div class="mb-3 col-md-3">
+                    <div>
+                        <label for="exampleInputEmail" class="form-label">Sender ID</label>
+                        <input readonly type="number" th:field="${customer.id}"  class="form-control" id="exampleInputEmail">
+                    </div>
+                    <div >
+                        <label for="sel1" class="form-label">Recipient Name</label>
+
+                        <select class="form-select" id="sel1" th:field="*{recipientId}" >
+                                <option th:each="item : ${customers}" th:value="${item.id}" th:text="'(' + ${item.id} + ') ' + ${item.fullName}"></option>
+                        </select>
+
+                    </div>
+                </div>
+                <div class="mb-3 col-md-3">
+                    <div>
+                        <label for="exampleInputEmail0" class="form-label">Sender Name</label>
+                        <input readonly type="text" th:field="${customer.fullName}" class="form-control" id="exampleInputEmail0">
+                    </div>
+                    <div >
+                        <label for="exampleInputEmail1" class="form-label">Transfer Amount ($)</label>
+                        <input onchange="myConvert()" name="transferAmount" th:value="*{transferAmount}" type="number" class="form-control" id="exampleInputEmail1">
+                    </div>
+                </div>
+                <div class="mb-3 col-md-3">
+                    <div>
+                        <label for="exampleInputEmail2" class="form-label">Email</label>
+                        <input readonly th:field="${customer.email}" type="email" class="form-control" id="exampleInputEmail2">
+                    </div>
+                    <div>
+                        <label for="exampleInputEmail3" class="form-label">Fees (%)</label>
+                        <input readonly name="fees" th:field="*{fees}"  type="number" class="form-control" id="exampleInputEmail3">
+                    </div>
+                </div>
+                <div class="mb-3 col-md-3">
+                    <div>
+                        <label for="exampleInputEmail4" class="form-label">Sender balance</label>
+                        <input  readonly type="number" th:field="${customer.balance}" class="form-control" id="exampleInputEmail4">
+                    </div>
+                    <div >
+                        <label for="exampleInputEmail5" class="form-label">Total amount of transaction ($)</label>
+                        <input readonly type="number" th:field="*{transactionAmount}" class="form-control" id="exampleInputEmail5" name="transactionAmount">
+                    </div>
+                </div>
+                <div class=" mb-3 col-md-12">
+                    <button type="submit" class="btn btn-outline-primary"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer</button>
+                </div>
+            </div>
+        </form>
+        <div class="alert" style="position: fixed; bottom: 0">
+            <th:block th:if="${message}">
+                <div class="alert alert-success alert-dismissible fade show">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <span th:text="${message}"></span>
+                </div>
+            </th:block>
+        </div>
+    </div>
+    <script>
+        function myConvert(){
+            var x = document.getElementById("exampleInputEmail1").value;
+            var y = document.getElementById("exampleInputEmail3").value;
+            document.getElementById("exampleInputEmail5").value = (x * (1 + y/100)).toFixed(2);
+        }
+    </script>
+    <script src="/assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
