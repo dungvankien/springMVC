@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="shortcut icon" href="/assets/social-linkedin-box-white-icon.png">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>customers</title>
+  <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/sweetalert/v2/sweetalert2.min.css">
+  <style>
+      .row {
+          height: 100px;
+          padding: 20px;
+          margin-left: 0;
+          margin-right: 0;
+      }
+
+      .row>div>h1 {
+          color: white;
+      }
+
+      .row>div>a {
+          margin-top: 10px;
+          margin-bottom: 10px;
+      }
+
+      .button-head , .button-main{
+          text-align: end;
+      }
+
+      thead {
+          background-color: rgb(10, 141, 21);
+          text-align: center;
+          color: white;
+      }
+
+      .button-main > button {
+          margin-left: 10px;
+      }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row bg-primary">
+      <div class="col-6">
+        <h1>List of customers</h1>
+      </div>
+      <div class="col-6 button-head">
+        <a  href="/transferInformation" type="button" class="btn btn-outline-light"><i class="fa-solid fa-clock-rotate-left"></i> Transfer money
+          Information</a>
+        <button id="btnShowCreateModal" class="btn btn-outline-light">
+          <i class="fas fa-plus"></i>
+          <span>Add New Customer</span>
+        </button>
+      </div>
+    </div>
+    <div class="main-body">
+      <table class="table table-hover" id="tbCustomer">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">FullName</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Address</th>
+            <th scope="col">Balance</th>
+            <th scope="col" colspan="5">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal create</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmCreate" method="post">
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameCre" name="fullNameCre" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Email</label>
+                            <input type="email" id="emailCre" name="emailCre" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Phone</label>
+                            <input type="tel" id="phoneCre" name="phoneCre" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Address</label>
+                            <input type="text" id="addressCre" name="addressCre" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnCreate" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <script src="/assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/jquery/jquery-3.6.1.min.js"></script>
+  <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+  <script src="/assets/sweetalert/v2/sweetalert2.js"></script>
+  <script src="assets/js/popper-v1.16.0.min.js"></script>
+  <script src="/assets/js/app.js"></script>
+  <script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+  </script>
+
+  <script>
+    let page = {
+      urls: {
+        getAllCustomers: App.BASE_URL_CUSTOMER,
+        getCustomerById: App.BASE_URL_CUSTOMER,
+        createCustomer: App.BASE_URL_CUSTOMER + "/create",
+      },
+      elements: {},
+      loadData: {},
+      commands: {},
+      dialogs: {
+        elements: {},
+        loadData: {},
+        commands: {},
+      }
+    }
+
+    let customer = new Customer();
+    page.elements.tbCustomer = $("#tbCustomer tbody");
+
+    page.dialogs.elements.frmCreate = $("#frmCreate");
+    page.dialogs.elements.fullNameCre = $("#fullNameCre");
+    page.dialogs.elements.emailCre = $("#emailCre");
+    page.dialogs.elements.phoneCre = $("#phoneCre");
+    page.dialogs.elements.addressCre = $("#addressCre");
+    page.dialogs.elements.btnCreate = $("#btnCreate");
+
+    page.commands.getAllCustomers = () => {
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "GET",
+        url: page.urls.getAllCustomers
+      })
+      .done((data) => {
+        data.map(item => {
+          page.elements.tbCustomer.prepend(App.renderRowCustomer(item));
+        });
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
+      })
+    }
+
+    page.commands.getCustomerById = (customerId) => {
+      return $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "GET",
+        url: page.urls.getCustomerById + "/" + customerId
+      })
+      .done((data) => {
+        customer = data;
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
+      })
+    }
+
+    $("#btnShowCreateModal").on("click", () => {
+      $("#modalCreate").modal("show");
+    });
+
+    $("#btnCreate").on("click", () => {
+      $("#frmCreate").trigger("submit");
+    })
+
+    page.commands.createCustomer = () => {
+      customer.id = 0;
+      customer.fullName = page.dialogs.elements.fullNameCre.val();
+      customer.email = page.dialogs.elements.emailCre.val();
+      customer.phone = page.dialogs.elements.phoneCre.val();
+      customer.address = page.dialogs.elements.addressCre.val();
+      customer.balance = 0;
+
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "POST",
+        url: page.urls.createCustomer,
+        data: JSON.stringify(customer)
+      })
+      .done((data) => {
+        page.elements.tbCustomer.prepend(App.renderRowCustomer(data));
+
+        page.elements.modalCreate.modal("hide");
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+      })
+    }
+
+    page.dialogs.elements.frmCreate.validate({
+      rules: {
+        fullNameCre: {
+          required: true,
+          minlength: 5,
+          maxlength: 50
+        }
+      },
+      messages: {
+        fullNameCre: {
+          required: "Vui lòng nhập tên đầy đủ",
+          minlength: "Họ tên tối thiểu 5 ký tự",
+          maxlength: "Họ tên tối đa 50 ký tự"
+        }
+      },
+      submitHandler: function(){
+        page.commands.createCustomer();
+      }
+    })
+
+    page.commands.getAllCustomers();
+
+  </script>
+</body>
+
+</html>

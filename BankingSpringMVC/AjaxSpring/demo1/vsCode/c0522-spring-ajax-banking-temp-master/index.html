@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List of customers</title>
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/bootstrap/v5.2.2/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/font-awesome/v5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/sweetalert/v2/sweetalert2.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="row">
+                <div class="col-sm-5">
+                    <h1>List of customers</h1>
+                </div>
+                <div class="col-sm-7">
+                    <button id="btnShowCreateModal" class="btn btn-outline-light">
+                        <i class="fas fa-plus"></i>
+                        <span>Add New Customer</span>
+                    </button>
+                    <a href="/transfers" class="btn btn-outline-light">
+                        <i class="fas fa-history"></i>
+                        <span>Transfer money Information</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <table id="tbCustomer" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>FullName</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Balance</th>
+                        <th colspan="5">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal create</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="frmCreate" method="post">
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Full Name</label>
+                                <input type="text" id="fullName" name="fullName" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Email</label>
+                                <input type="email" id="email" name="email" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Phone</label>
+                                <input type="tel" id="phone" name="phone" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Address</label>
+                                <input type="text" id="address" name="address" class="form-control">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnCreate" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal deposit</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="frmDeposit" method="post">
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Customer ID</label>
+                                <input type="text" id="customerIdDep" name="customerIdDep" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Full Name</label>
+                                <input type="text" id="fullNameDep" name="fullNameDep" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Current balance ($)</label>
+                                <input type="text" id="balanceDep" name="balanceDep" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Transaction Amount ($)</label>
+                                <input type="text" id="transactionAmountDep" name="transactionAmountDep" class="form-control">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnDeposit" class="btn btn-outline-success">
+                        <i class="fas fa-plus"></i>
+                        Deposit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/assets/jquery/jquery-v3.6.0.min.js"></script>
+    <script type="text/javascript" src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+    <script type="text/javascript" src="/assets/sweetalert/v2/sweetalert2.js"></script>
+    <script type="text/javascript" src="/assets/bootstrap/v5.2.2/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/assets/js/popper-v1.16.0.min.js"></script>
+
+    <script>
+
+        let customer = {};
+
+        function getAllCustomers() {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: "http://localhost:8089/api/customers"
+            })
+            .done((data) => {
+                data.map(item => {
+                    let str = `
+                        <tr id="tr_${item.id}">
+                            <td>${item.id}</td>
+                            <td>${item.fullName}</td>
+                            <td>${item.email}</td>
+                            <td class="text-center">${item.phone}</td>
+                            <td>${item.address}</td>
+                            <td class="text-end num-space">${item.balance}</td>
+                            <td class="text-center">
+                                <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-outline-success deposit" data-id="${item.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
+                                    <i class="fas fa-minus"></i>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                    $("#tbCustomer tbody").prepend(str);
+                });
+                
+                handleOpenModalDeposit();
+            })
+            .fail((jqXHR) => {
+                alert("Get All cutomers Fail");
+            })
+        }
+
+        function getCustomerById(customerId) {
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: "http://localhost:8089/api/customers/" + customerId
+            })
+            .done((data) => {
+                customer = data;
+            })
+            .fail((jqXHR) => {
+
+            })
+        }
+
+        $("#btnShowCreateModal").on("click", () => {
+            $("#modalCreate").modal("show");
+        });
+
+        
+
+        $("#btnCreate").on("click", () => {
+            $("#frmCreate").trigger("submit");
+        })
+
+        $("#btnDeposit").on("click", () => {
+            $("#frmDeposit").trigger("submit");
+        })
+
+        function handleOpenModalDeposit() {
+            $(".deposit").on("click", function () {
+                let customerId = $(this).data("id");
+
+                getCustomerById(customerId).then(() => {
+                    $("#customerIdDep").val(customer.id);
+                    $("#fullNameDep").val(customer.fullName);
+                    $("#balanceDep").val(customer.balance);
+
+                    $("#modalDeposit").modal("show");
+                })
+                .catch(() => {
+                    alert("Customer not found");
+                });
+            });
+        }
+
+        function removeEventOpenModalDeposit() {
+            $(".deposit").off();
+        }
+
+        function createCustomer() {
+
+            let customer = {
+                fullName: $("#fullName").val(),
+                email: $("#email").val(),
+                phone: $("#phone").val(),
+                address: $("#address").val(),
+            }
+
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: "http://localhost:8089/api/customers/create",
+                data: JSON.stringify(customer)
+            })
+            .done((data) => {
+                let str = `
+                    <tr>
+                        <td>${data.id}</td>
+                        <td>${data.fullName}</td>
+                        <td>${data.email}</td>
+                        <td class="text-center">${data.phone}</td>
+                        <td>${data.address}</td>
+                        <td class="text-end num-space">${data.balance}</td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-success deposit" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
+                                <i class="fas fa-minus"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
+                                <i class="fas fa-exchange-alt"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `;
+
+                $("#tbCustomer tbody").prepend(str);
+
+                removeEventOpenModalDeposit();
+                handleOpenModalDeposit();
+
+                $("#modalCreate").modal("hide");
+            })
+            .fail((jqXHR) => {
+                alert("Create Fail");
+            })
+        }
+
+        function deposit() {
+            
+            let deposit = {
+                customerId: $("#customerIdDep").val(),
+                transactionAmount: $("#transactionAmountDep").val(),
+            }
+
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: "http://localhost:8089/api/customers/deposit",
+                data: JSON.stringify(deposit)
+            })
+            .done((data) => {
+                let str = `
+                    <tr id="tr_${data.id}">
+                        <td>${data.id}</td>
+                        <td>${data.fullName}</td>
+                        <td>${data.email}</td>
+                        <td class="text-center">${data.phone}</td>
+                        <td>${data.address}</td>
+                        <td class="text-end num-space">${data.balance}</td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-success deposit" data-id="${data.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
+                                <i class="fas fa-minus"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
+                                <i class="fas fa-exchange-alt"></i>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `;
+
+                let currentRow = $("#tr_" + data.id);
+
+                currentRow.replaceWith(str);
+
+                removeEventOpenModalDeposit();
+                handleOpenModalDeposit();
+
+                $("#modalDeposit").modal("hide");
+            })
+            .fail((jqXHR) => {
+                alert("Deposit Fail");
+            })
+        }
+
+        $("#frmCreate").validate({
+            rules: {
+                fullName: {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 35
+                }
+            },
+            messages: {
+                fullName: {
+                    required: "Vui lòng nhập tên đầy đủ",
+                    minlength: "Họ tên tối thiểu 5 ký tự",
+                    maxlength: "Họ tên tối đa 35 ký tự"
+                }
+            },
+            submitHandler: function () {
+                createCustomer();
+            }
+        })
+
+        $("#frmDeposit").validate({
+            rules: {
+                transactionAmountDep: {
+                    required: true,
+                    min: 500,
+                    max: 1000000
+                }
+            },
+            messages: {
+                transactionAmountDep: {
+                    required: "Vui lòng nhập số tiền giao dịch đầy đủ",
+                    min: "Số tiền giao dịch tối thiểu là {0}",
+                    max: "Số tiền giao dịch tối đa là {0}"
+                }
+            },
+            submitHandler: function () {
+                deposit();
+            }
+        })
+
+
+        getAllCustomers();
+
+    </script>
+
+</body>
+</html>
