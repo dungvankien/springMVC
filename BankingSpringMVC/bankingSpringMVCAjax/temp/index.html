@@ -203,6 +203,48 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modalWithdraw" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal withdraw</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmWithdraw" method="post">
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Customer ID</label>
+                            <input type="text" id="customerIdWd" name="customerIdDep" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameWd" name="fullNameDep" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Current balance ($)</label>
+                            <input type="text" id="balanceWd" name="balanceDep" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Transaction Amount ($)</label>
+                            <input type="text" id="transactionAmountWd" name="transactionAmountDep" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnWithdraw" class="btn btn-outline-success">
+                    <i class="fas fa-plus"></i>
+                    Withdraw
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
+
 
   <script src="/assets/jquery/jquery-3.6.1.min.js"></script>
   <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
@@ -225,7 +267,8 @@
         getCustomerById: App.BASE_URL_CUSTOMER,
         createCustomer: App.BASE_URL_CUSTOMER + "/create",
         editCustomer: App.BASE_URL_CUSTOMER + "/edit",
-        deposit: App.BASE_URL_CUSTOMER + "/deposit"
+        deposit: App.BASE_URL_CUSTOMER + "/deposit",
+        withdraw: App.BASE_URL_CUSTOMER + "/withdraw"
       },
       elements: {},
       loadData: {},
@@ -244,7 +287,8 @@
     page.elements.tbCustomer = $("#tbCustomer tbody");
     page.elements.modalCreate = $("#modalCreate");
     page.elements.modalEdit = $("#modalEdit")
-    page.elements.modalDeposit = $("modalDeposit");
+    page.elements.modalDeposit = $("#modalDeposit");
+    page.elements.modalWithdraw = $("#modalWithdraw");
 
     page.dialogs.elements.frmCreate = $("#frmCreate");
     page.dialogs.elements.fullNameCre = $("#fullNameCre");
@@ -267,6 +311,13 @@
     page.dialogs.elements.transactionAmountDep = $("#transactionAmountDep");
     page.dialogs.elements.btnDeposit = $("#btnDeposit");
 
+    page.dialogs.elements.frmWithdraw = $("#frmWithdraw");
+    page.dialogs.elements.customerIdWd = $("#customerIdWd");
+    page.dialogs.elements.fullNameWd = $("#fullNameWd");
+    page.dialogs.elements.balanceWd = $("#balanceWd");
+    page.dialogs.elements.transactionAmountWd = $("#transactionAmountWd");
+    page.dialogs.elements.btnWithdraw = $("#btnWithdraw");
+
     page.commands.getAllCustomers = () => {
       $.ajax({
         headers: {
@@ -283,6 +334,7 @@
 
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalWithdraw();
 
       })
       .fail((jqXHR) => {
@@ -323,6 +375,27 @@
       $("#frmDeposit").trigger("submit");
     })
 
+    $("#btnWithdraw").on("click", () => {
+      $("#frmWithdraw").trigger("submit");
+    })
+
+    page.commands.handleOpenModalWithdraw = () => {
+      $(".withdraw").on("click", function() {
+        let customerId = $(this).data("id");
+
+        page.commands.getCustomerById(customerId).then(() => {
+          page.dialogs.elements.customerIdWd.val(customer.id);
+          page.dialogs.elements.fullNameWd.val(customer.fullName);
+          page.dialogs.elements.balanceWd.val(customer.balance);
+
+          page.elements.modalWithdraw.modal("show");
+        })
+        .catch(() => {
+          App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+        });
+      });
+    }
+
 
     page.commands.handleOpenModalDeposit = () => {
       $(".deposit").on("click", function(){
@@ -361,6 +434,37 @@
       });
     }
 
+    page.dialogs.commands.withdrawCustomer = () => {
+      withdraw.id = 0;
+      withdraw.customerId = page.dialogs.elements.customerIdWd.val();
+      withdraw.transactionAmount = page.dialogs.elements.transactionAmountWd.val();
+
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "POST",
+        url: page.urls.withdraw,
+        data: JSON.stringify(withdraw)
+      })
+      .done((data) => {
+        let currentRow = $("#tr_" + data.id);
+        currentRow.replaceWith(App.renderRowCustomer(data));
+
+        page.commands.removeEventOpenModal();
+        page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalWithdraw();
+
+        page.elements.modalWithdraw.modal("hide");
+        App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_WITHDRAW);
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400)
+      })
+    }
+
     page.dialogs.commands.depositCustomer = () => {
       deposit.id = 0;
       deposit.customerId = page.dialogs.elements.customerIdDep.val();
@@ -382,6 +486,7 @@
         page.commands.removeEventOpenModal();
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalWithdraw();
 
         $("#modalDeposit").modal("hide");
         App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEPOSIT);
@@ -415,9 +520,10 @@
         page.commands.removeEventOpenModal();
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalWithdraw();
 
         page.elements.modalEdit.modal("hide");
-        App.SweetAlert.showAlertError(App.AlertMessageVi.SUCCESS_UPDATED);
+        App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_UPDATED);
       })
       .fail((jqXHR) => {
         App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
@@ -447,6 +553,7 @@
         page.commands.removeEventOpenModal();
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalWithdraw();
 
         page.elements.modalCreate.modal("hide");
       })
@@ -458,7 +565,28 @@
     page.commands.removeEventOpenModal = () => {
       $(".edit").off();
       $(".deposit").off();
+      $(".withdraw").off();
     }
+
+    page.dialogs.elements.frmWithdraw.validate({
+      rules: {
+        transactionAmountWd: {
+          required: true,
+          min: 500,
+          max: 10000000
+        }
+      },
+      messages: {
+        transactionAmountWd: {
+          required: "Vui lòng nhập số tiền giao dịch đầy đủ",
+          min: "Số tiền giao dịch tối thiểu là {0}",
+          max: "Số tiền giao dịch tối đa là {0}"
+        }
+      },
+      submitHandler: function () {
+        page.dialogs.commands.withdrawCustomer();
+      }
+    });
 
     page.dialogs.elements.frmDeposit.validate({
       rules: {

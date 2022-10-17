@@ -36,7 +36,7 @@ public class Customer extends BaseEntity {
     @OneToMany(targetEntity = Deposit.class,  fetch = FetchType.EAGER)
     private Set<Deposit> deposits;
 
-    @OneToMany(targetEntity = Withdraw.class, mappedBy = "customer", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Withdraw.class, fetch = FetchType.EAGER)
     private Set<Withdraw> withdraws;
 
     @OneToMany(targetEntity = Transfer.class, mappedBy = "sender", fetch = FetchType.EAGER)

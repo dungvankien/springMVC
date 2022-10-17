@@ -1,7 +1,11 @@
 package com.bank.service.customer;
 
 import com.bank.model.Customer;
+import com.bank.model.Deposit;
+import com.bank.model.Withdraw;
 import com.bank.repository.CustomerRepository;
+import com.bank.repository.DepositRepository;
+import com.bank.repository.WithdrawRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +17,11 @@ import java.util.Optional;
 public class CustomerServiceImpl implements ICustomerService{
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private DepositRepository depositRepository;
+
+    @Autowired
+    private WithdrawRepository withdrawRepository;
     @Override
     public Iterable<Customer> findfAll() {
         return customerRepository.findAll();
@@ -42,6 +51,44 @@ public class CustomerServiceImpl implements ICustomerService{
     @Override
     public Iterable<Customer> findAllByDeletedIsFalse() {
         return customerRepository.findAllByDeletedIsFalse();
+    }
+
+    @Override
+    public Customer deposit(Customer customer, Deposit deposit) {
+        BigDecimal transactionAmount = deposit.getTransactionAmount();
+        BigDecimal currentBalance = customer.getBalance();
+        try{
+            customerRepository.incrementBalance(transactionAmount, customer.getId());
+            deposit.setId(0L);
+            deposit.setCustomer(customer);
+            depositRepository.save(deposit);
+            Optional<Customer> newCustomer = customerRepository.findById(customer.getId());
+            return newCustomer.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            customer.setBalance(currentBalance);
+            return customer;
+        }
+    }
+
+    @Override
+    public Customer withdraw(Customer customer, Withdraw withdraw) {
+        BigDecimal currentBalance = customer.getBalance();
+        BigDecimal transactionAmount = withdraw.getTransactionAmount();
+        try {
+            customerRepository.reduceBalance(transactionAmount, customer.getId());
+
+            withdraw.setId(0L);
+            withdraw.setCustomer(customer);
+            withdrawRepository.save(withdraw);
+
+            Optional<Customer> newCustomer = customerRepository.findById(customer.getId());
+            return newCustomer.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            customer.setBalance(currentBalance);
+            return customer;
+        }
     }
 
     @Override

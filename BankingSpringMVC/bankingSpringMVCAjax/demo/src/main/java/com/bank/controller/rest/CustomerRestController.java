@@ -2,10 +2,8 @@ package com.bank.controller.rest;
 
 import com.bank.model.Customer;
 import com.bank.model.Deposit;
-import com.bank.model.dto.CustomerCreateDTO;
-import com.bank.model.dto.CustomerDTO;
-import com.bank.model.dto.CustomerEditDTO;
-import com.bank.model.dto.DepositDTO;
+import com.bank.model.Withdraw;
+import com.bank.model.dto.*;
 import com.bank.service.customer.ICustomerService;
 import com.bank.service.deposit.IDepositService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +57,10 @@ public class CustomerRestController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<CustomerDTO> depositAmount(@RequestBody DepositDTO depositDTO){
+    public ResponseEntity<CustomerDTO> depositAmount(@RequestBody DepositDTO depositDTO) {
         Long customerId = depositDTO.getCustomerId();
         Optional<Customer> customerOptional = customerService.findById(customerId);
-        if(!customerOptional.isPresent()) {
+        if (!customerOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Deposit deposit = new Deposit();
@@ -70,9 +68,29 @@ public class CustomerRestController {
         BigDecimal transactionAmount = new BigDecimal(depositDTO.getTransactionAmount());
         deposit.setTransactionAmount(transactionAmount);
         deposit.setCustomer(customer);
-        customerService.incrementBalance(transactionAmount, customerId);
-        depositService.save(deposit);
-        Optional<Customer> newCustomer = customerService.findById(customerId);
-        return new ResponseEntity<>(newCustomer.get().toCustomerDTO(),HttpStatus.CREATED);
+        Customer newCustomer = customerService.deposit(customer, deposit);
+
+        return new ResponseEntity<>(newCustomer.toCustomerDTO(), HttpStatus.CREATED);
     }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<CustomerDTO> withdrawAmount(@RequestBody WithdrawDTO withdrawDTO){
+        Long customerId = withdrawDTO.getCustomerId();
+        Optional<Customer> customerOptional = customerService.findById(customerId);
+        if(!customerOptional.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BigDecimal tracsactionAmount = new BigDecimal(withdrawDTO.getTransactionAmount());
+        if(customerOptional.get().getBalance().compareTo(tracsactionAmount) < 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Withdraw withdraw = new Withdraw();
+        withdraw.setTransactionAmount(tracsactionAmount);
+        withdraw.setCustomer(customerOptional.get());
+
+        Customer newCustomer = customerService.withdraw(customerOptional.get(), withdraw);
+
+        return new ResponseEntity<>(newCustomer.toCustomerDTO(), HttpStatus.CREATED);
+    }
+
 }

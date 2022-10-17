@@ -1,12 +1,18 @@
 package com.bank.service.customer;
 
 import com.bank.model.Customer;
+import com.bank.model.Deposit;
+import com.bank.model.Withdraw;
 import com.bank.service.IGeneralService;
+import lombok.With;
 
 import java.math.BigDecimal;
 
 public interface ICustomerService extends IGeneralService<Customer> {
 Iterable<Customer>findAllByDeletedIsFalse();
+
+Customer deposit(Customer customer, Deposit deposit);
+Customer withdraw (Customer customer, Withdraw withdraw);
 
 void incrementBalance(BigDecimal balance, Long id);
 
