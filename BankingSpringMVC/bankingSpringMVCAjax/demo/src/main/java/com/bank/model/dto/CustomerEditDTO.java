@@ -14,14 +14,14 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CustomerCreateDTO {
+public class CustomerEditDTO {
     private Long id;
     private String fullName;
     private String email;
     private String phone;
     private String address;
-
     private String balance;
+
     public Customer toCustomer(){
         return new Customer()
                 .setId(id)
@@ -29,6 +29,7 @@ public class CustomerCreateDTO {
                 .setEmail(email)
                 .setPhone(phone)
                 .setAddress(address)
-                .setBalance(new BigDecimal(0L));
+                .setBalance(BigDecimal.valueOf(Long.parseLong(balance)));
     }
+
 }

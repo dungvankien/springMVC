@@ -2,6 +2,7 @@ package com.bank.model;
 
 import com.bank.model.dto.CustomerCreateDTO;
 import com.bank.model.dto.CustomerDTO;
+import com.bank.model.dto.CustomerEditDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class Customer extends BaseEntity {
     private BigDecimal balance;
     //Lien ket khoa ngoai
 
-    @OneToMany(targetEntity = Deposit.class, mappedBy = "customer", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Deposit.class,  fetch = FetchType.EAGER)
     private Set<Deposit> deposits;
 
     @OneToMany(targetEntity = Withdraw.class, mappedBy = "customer", fetch = FetchType.EAGER)
@@ -55,6 +56,15 @@ public class Customer extends BaseEntity {
     }
     public CustomerCreateDTO toCustomerCreateDTO(){
         return new CustomerCreateDTO()
+                .setId(id)
+                .setFullName(fullName)
+                .setEmail(email)
+                .setPhone(phone)
+                .setAddress(address)
+                .setBalance(balance.toString());
+    }
+    public CustomerEditDTO toCustomerEditDTO(){
+        return new CustomerEditDTO()
                 .setId(id)
                 .setFullName(fullName)
                 .setEmail(email)

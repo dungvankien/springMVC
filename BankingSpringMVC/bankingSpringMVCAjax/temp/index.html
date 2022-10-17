@@ -52,7 +52,7 @@
       <div class="col-6 button-head">
         <a  href="/transferInformation" type="button" class="btn btn-outline-light"><i class="fa-solid fa-clock-rotate-left"></i> Transfer money
           Information</a>
-        <button id="btnShowCreateModal" class="btn btn-outline-light">
+        <button id="btnShowCreateModal" class="btn btn-outline-light create">
           <i class="fas fa-plus"></i>
           <span>Add New Customer</span>
         </button>
@@ -117,28 +117,115 @@
             </div>
         </div>
     </div>
-</div>
+  </div>
+
+  <div class="modal fade" id="modalEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal edit</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmEdit" method="post">
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameEdit" name="fullNameEdit" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Email</label>
+                            <input type="email" id="emailEdit" name="emailEdit" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Phone</label>
+                            <input type="tel" id="phoneEdit" name="phoneEdit" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Address</label>
+                            <input type="text" id="addressEdit" name="addressEdit" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnEdit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Edit
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal deposit</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmDeposit" method="post">
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Customer ID</label>
+                            <input type="text" id="customerIdDep" name="customerIdDep" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameDep" name="fullNameDep" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-6">
+                            <label>Current balance ($)</label>
+                            <input type="text" id="balanceDep" name="balanceDep" class="form-control">
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Transaction Amount ($)</label>
+                            <input type="text" id="transactionAmountDep" name="transactionAmountDep" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnDeposit" class="btn btn-outline-success">
+                    <i class="fas fa-plus"></i>
+                    Deposit
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
 
 
-  <script src="/assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
   <script src="/assets/jquery/jquery-3.6.1.min.js"></script>
   <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+  <script src="/assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
   <script src="/assets/sweetalert/v2/sweetalert2.js"></script>
   <script src="assets/js/popper-v1.16.0.min.js"></script>
   <script src="/assets/js/app.js"></script>
+
   <script>
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
       return new bootstrap.Popover(popoverTriggerEl)
     })
   </script>
-
+  
   <script>
     let page = {
       urls: {
         getAllCustomers: App.BASE_URL_CUSTOMER,
         getCustomerById: App.BASE_URL_CUSTOMER,
         createCustomer: App.BASE_URL_CUSTOMER + "/create",
+        editCustomer: App.BASE_URL_CUSTOMER + "/edit",
+        deposit: App.BASE_URL_CUSTOMER + "/deposit"
       },
       elements: {},
       loadData: {},
@@ -151,7 +238,13 @@
     }
 
     let customer = new Customer();
+    let deposit = new Deposit();
+    let withdraw = new Withdraw();
+
     page.elements.tbCustomer = $("#tbCustomer tbody");
+    page.elements.modalCreate = $("#modalCreate");
+    page.elements.modalEdit = $("#modalEdit")
+    page.elements.modalDeposit = $("modalDeposit");
 
     page.dialogs.elements.frmCreate = $("#frmCreate");
     page.dialogs.elements.fullNameCre = $("#fullNameCre");
@@ -159,6 +252,20 @@
     page.dialogs.elements.phoneCre = $("#phoneCre");
     page.dialogs.elements.addressCre = $("#addressCre");
     page.dialogs.elements.btnCreate = $("#btnCreate");
+
+    page.dialogs.elements.frmEdit = $("#frmEdit");
+    page.dialogs.elements.fullNameEdit = $("#fullNameEdit");
+    page.dialogs.elements.emailEdit = $("#emailEdit");
+    page.dialogs.elements.phoneEdit = $("#phoneEdit");
+    page.dialogs.elements.addressEdit = $("#addressEdit");
+    page.dialogs.elements.btnEdit = $("#btnEdit");
+
+    page.dialogs.elements.frmDeposit = $("#frmDeposit");
+    page.dialogs.elements.customerIdDep = $("#customerIdDep");
+    page.dialogs.elements.fullNameDep = $("#fullNameDep");
+    page.dialogs.elements.balanceDep = $("#balanceDep");
+    page.dialogs.elements.transactionAmountDep = $("#transactionAmountDep");
+    page.dialogs.elements.btnDeposit = $("#btnDeposit");
 
     page.commands.getAllCustomers = () => {
       $.ajax({
@@ -173,6 +280,10 @@
         data.map(item => {
           page.elements.tbCustomer.prepend(App.renderRowCustomer(item));
         });
+
+        page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalDeposit();
+
       })
       .fail((jqXHR) => {
         App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
@@ -193,7 +304,7 @@
       })
       .fail((jqXHR) => {
         App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
-      })
+      });
     }
 
     $("#btnShowCreateModal").on("click", () => {
@@ -203,6 +314,115 @@
     $("#btnCreate").on("click", () => {
       $("#frmCreate").trigger("submit");
     })
+
+    $("#btnEdit").on("click", () => {
+      $("#frmEdit").trigger("submit");
+    })
+
+    $("#btnDeposit").on("click", () =>{
+      $("#frmDeposit").trigger("submit");
+    })
+
+
+    page.commands.handleOpenModalDeposit = () => {
+      $(".deposit").on("click", function(){
+        let customerId = $(this).data("id");
+
+        page.commands.getCustomerById(customerId).then(() => {
+          $("#customerIdDep").val(customer.id);
+          $("#fullNameDep").val(customer.fullName);
+          $("#balanceDep").val(customer.balance);
+
+          $("#modalDeposit").modal("show");
+        })
+        .catch(() => {
+          console.log("get deposit fail");
+          App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+        });
+      });
+    }
+
+    page.commands.handleOpenModalEdit = () => {
+      $(".edit").on("click", function (){
+        let customerId = $(this).data("id");
+
+        page.commands.getCustomerById(customerId).then(() => {
+          $("#fullNameEdit").val(customer.fullName);
+          $("#emailEdit").val(customer.email);
+          $("#phoneEdit").val(customer.phone);
+          $("#addressEdit").val(customer.address);
+
+          $("#modalEdit").modal("show");
+        })
+        .catch(() => {
+          console.log("get edit fail");
+          App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+        });
+      });
+    }
+
+    page.dialogs.commands.depositCustomer = () => {
+      deposit.id = 0;
+      deposit.customerId = page.dialogs.elements.customerIdDep.val();
+      deposit.transactionAmount = page.dialogs.elements.transactionAmountDep.val();
+
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "POST",
+        url: page.urls.deposit,
+        data: JSON.stringify(deposit)
+      })
+      .done((data) => {
+        let currentRow = $("#tr_" + data.id)
+        currentRow.replaceWith(App.renderRowCustomer(data));
+
+        page.commands.removeEventOpenModal();
+        page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalEdit();
+
+        $("#modalDeposit").modal("hide");
+        App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEPOSIT);
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+      })
+    }
+
+    page.dialogs.commands.editCustomer = () => {
+      customer.id;
+      customer.fullName = page.dialogs.elements.fullNameEdit.val();
+      customer.email = page.dialogs.elements.emailEdit.val();
+      customer.phone = page.dialogs.elements.phoneEdit.val();
+      customer.address = page.dialogs.elements.addressEdit.val();
+      customer.balance;
+
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "POST",
+        url: page.urls.editCustomer,
+        data: JSON.stringify(customer)
+      })
+      .done((data) => {
+        let currentRow = $("#tr_" + data.id)
+        currentRow.replaceWith(App.renderRowCustomer(data));
+
+        page.commands.removeEventOpenModal();
+        page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalDeposit();
+
+        page.elements.modalEdit.modal("hide");
+        App.SweetAlert.showAlertError(App.AlertMessageVi.SUCCESS_UPDATED);
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+      })
+    }
 
     page.commands.createCustomer = () => {
       customer.id = 0;
@@ -223,6 +443,10 @@
       })
       .done((data) => {
         page.elements.tbCustomer.prepend(App.renderRowCustomer(data));
+        
+        page.commands.removeEventOpenModal();
+        page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalDeposit();
 
         page.elements.modalCreate.modal("hide");
       })
@@ -230,6 +454,51 @@
         App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
       })
     }
+
+    page.commands.removeEventOpenModal = () => {
+      $(".edit").off();
+      $(".deposit").off();
+    }
+
+    page.dialogs.elements.frmDeposit.validate({
+      rules: {
+        transactionAmountDep: {
+          required: true,
+          min: 500,
+          max: 50000000
+        }
+      },
+      messages: {
+        transactionAmountDep: {
+          required: "Vui lòng nhập số tiền giao dịch đầy đủ",
+          min: "Số tiền giao dịch tối thiểu là {0}",
+          max: "Số tiền giao dịch tối đa là {0}"
+        }
+      },
+      submitHandler: function (){
+        page.dialogs.commands.depositCustomer();
+      }
+    })
+
+    page.dialogs.elements.frmEdit.validate({
+      rules: {
+        fullNameEdit: {
+          required: true,
+          minlength: 5,
+          maxlength: 50
+        }
+      },
+      messages: {
+        fullNameEdit: {
+          required: "Vui lòng nhập tên đầy đủ",
+          minlength: "Họ tên tối thiểu 5 ký tự",
+          maxlength: "Họ tên tối đa 50 ký tự"
+        }
+      },
+      submitHandler: function(){
+        page.dialogs.commands.editCustomer();
+      }
+    })
 
     page.dialogs.elements.frmCreate.validate({
       rules: {

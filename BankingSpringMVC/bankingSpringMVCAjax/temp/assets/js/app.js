@@ -68,31 +68,31 @@ class App {
             <td class="text-center">${obj.phone}</td>
             <td>${obj.address}</td>
             <td class="text-end num-space">${obj.balance}</td>
-            <td class="text-center">
-                <a class="btn btn-outline-secondary edit" data-id="${obj.id}" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
-                    <i class="fas fa-edit"></i>
-                </a>
-            </td>
-            <td class="text-center">
-                <a class="btn btn-outline-success deposit" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
-                    <i class="fas fa-plus"></i>
-                </a>
-            </td>
-            <td class="text-center">
-                <a class="btn btn-outline-warning withdraw" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
-                    <i class="fas fa-minus"></i>
-                </a>
-            </td>
-            <td class="text-center">
-                <a class="btn btn-outline-primary transfer" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
-                    <i class="fas fa-exchange-alt"></i>
-                </a>
-            </td>
-            <td class="text-center">
-                <a class="btn btn-outline-danger delete" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
-                    <i class="fas fa-trash-alt"></i>
-                </a>
-            </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-secondary edit" data-id="${obj.id}" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-success deposit" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-warning withdraw" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
+                        <i class="fas fa-minus"></i>
+                    </a>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-primary transfer" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
+                        <i class="fas fa-exchange-alt"></i>
+                    </a>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-outline-danger delete" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
         </tr>
     `;
     return str;
@@ -107,5 +107,21 @@ class Customer {
         this.phone = phone;
         this.address = address;
         this.balance = balance;
+    }
+}
+
+class Withdraw {
+    constructor(id, customerId, transactionAmount){
+        this.id = id;
+        this.customerId = customerId;
+        this.transactionAmount = transactionAmount;
+    }
+}
+
+class Deposit {
+    constructor(id, customerId, transactionAmount){
+        this.id = id;
+        this.customerId = customerId;
+        this.transactionAmount = transactionAmount;
     }
 }

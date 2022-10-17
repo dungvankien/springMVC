@@ -29,6 +29,7 @@ public class DepositServiceImpl implements IDepositService{
 
     @Override
     public Deposit save(Deposit deposit) {
+        deposit.setDeleted(false);
         return depositRepository.save(deposit);
     }
 

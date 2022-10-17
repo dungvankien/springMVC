@@ -1,10 +1,13 @@
 package com.bank.model;
 
+import lombok.experimental.Accessors;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "deposits")
+@Accessors(chain = true)
 public class Deposit extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
