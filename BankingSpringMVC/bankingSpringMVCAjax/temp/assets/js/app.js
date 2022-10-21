@@ -57,6 +57,18 @@ class App {
                 showConfirmButton: true
             })
         }
+
+        static showSuspendedConfirmDialog() {
+            return Swal.fire({
+                icon: 'warning',
+                text: 'Are you sure to suspend the selected customer ?',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, please suspend this client !',
+                cancelButtonText: 'Cancel',
+            })
+        }
     }
 
     static renderRowCustomer(obj){
@@ -97,7 +109,25 @@ class App {
     `;
     return str;
     }
+
+    static renderRowTransferHistory(obj){
+        let str =`
+            <tr id="tr_${obj.id}">
+                <td>${obj.id}</td>
+                <td>${obj.createdAt}</td>
+                <td>${obj.senderId}</td>
+                <td>${obj.senderName}</td>
+                <td>${obj.recipientId}</td>
+                <td>${obj.recipientName}</td>
+                <td class="text-end num-space">${obj.transferAmount}</td>
+                <td class="text-end num-space">${obj.fees}</td>
+                <td class="text-end num-space">${obj.feesAmount}</td>
+            </tr>
+        `;
+        return str;
+    }
 }
+
 
 class Customer {
     constructor(id, fullName, email, phone, address, balance){
@@ -123,5 +153,26 @@ class Deposit {
         this.id = id;
         this.customerId = customerId;
         this.transactionAmount = transactionAmount;
+    }
+}
+
+class Transfer{
+    constructor(id, senderId, recipientId, transferAmount){
+        this.id = id;
+        this.senderId =senderId;
+        this.recipientId = recipientId;
+        this.transferAmount = transferAmount;
+    }
+}
+
+class Sender extends Customer{
+    constructor(){
+        super();
+    }
+}
+
+class Recipient extends Customer{
+    constructor(){
+        super()
     }
 }

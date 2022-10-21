@@ -3,6 +3,7 @@ package com.bank.model;
 import com.bank.model.dto.CustomerCreateDTO;
 import com.bank.model.dto.CustomerDTO;
 import com.bank.model.dto.CustomerEditDTO;
+import com.bank.model.dto.RecipientDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,10 +40,10 @@ public class Customer extends BaseEntity {
     @OneToMany(targetEntity = Withdraw.class, fetch = FetchType.EAGER)
     private Set<Withdraw> withdraws;
 
-    @OneToMany(targetEntity = Transfer.class, mappedBy = "sender", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Transfer.class, fetch = FetchType.EAGER)
     private Set<Transfer> sender;
 
-    @OneToMany(targetEntity = Transfer.class, mappedBy = "recipient", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Transfer.class, fetch = FetchType.EAGER)
     private Set<Transfer> recipient;
 
     public CustomerDTO toCustomerDTO(){
@@ -72,4 +73,5 @@ public class Customer extends BaseEntity {
                 .setAddress(address)
                 .setBalance(balance.toString());
     }
+
 }

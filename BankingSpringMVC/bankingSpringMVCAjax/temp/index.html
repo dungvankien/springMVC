@@ -7,9 +7,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>customers</title>
-  <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/assets/bootstrap-5.2.0/css/all.min.css">
-  <link rel="stylesheet" href="/assets/sweetalert/v2/sweetalert2.min.css">
+  <link rel="stylesheet" href="./assets/bootstrap-5.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./assets/bootstrap-5.2.0/css/all.min.css">
+  <link rel="stylesheet" href="./assets/sweetalert/v2/sweetalert2.min.css">
   <style>
       .row {
           height: 100px;
@@ -40,6 +40,27 @@
       .button-main > button {
           margin-left: 10px;
       }
+
+    .modal-alert-danger {
+      padding: 10px 35px;
+      margin-bottom: 15px;
+      color: #842029;
+      background-color: #f8d7da;
+      border-color: #f5c2c7;
+      }
+
+      label.error {
+        display: list-item;
+        margin-top: 5px;
+        color: #842029;
+      }
+    .hide {
+      display: none;
+    }
+
+    .show {
+      display: block !important;
+    }
   </style>
 </head>
 
@@ -50,7 +71,7 @@
         <h1>List of customers</h1>
       </div>
       <div class="col-6 button-head">
-        <a  href="/transferInformation" type="button" class="btn btn-outline-light"><i class="fa-solid fa-clock-rotate-left"></i> Transfer money
+        <a  href="/transfers" type="button" class="btn btn-outline-light"><i class="fa-solid fa-clock-rotate-left"></i> Transfer money
           Information</a>
         <button id="btnShowCreateModal" class="btn btn-outline-light create">
           <i class="fas fa-plus"></i>
@@ -245,13 +266,74 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modalTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal Transfer</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-alert-danger hide">
+                </div>
+                <form id="frmTransfer" method="post">
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-3">
+                            <label>Sender ID</label>
+                            <input type="text" id="senderIdTrf" name="senderIdTrf" class="form-control">
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameTrf" name="fullNameTrf" class="form-control">
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Email</label>
+                            <input type="email" id="emailTrf" name="emailTrf" class="form-control">
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Balance</label>
+                            <input type="text" id="balanceTrf" name="balanceTrf" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row col-lg-12 mt-3">
+                        <div class="col-lg-3">
+                            <label>Recipient Name</label>
+                            <select id="recipientIdTrf" name="recipientIdTrf" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Transfer Amount ($)</label>
+                            <input type="text" id="transferAmountTrf" name="transferAmountTrf" class="form-control">
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Fees (%)</label>
+                            <input type="text" name="feesTrf" value="10" class="form-control" readonly>
+                        </div>
+                        <div class="col-lg-3">
+                            <label>Transaction Amount ($)</label>
+                            <input type="text" id="transactionAmountTrf" name="transactionAmountTrf" class="form-control" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="btnTransfer" class="btn btn-outline-primary">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transfer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
 
-  <script src="/assets/jquery/jquery-3.6.1.min.js"></script>
-  <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
-  <script src="/assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
-  <script src="/assets/sweetalert/v2/sweetalert2.js"></script>
-  <script src="assets/js/popper-v1.16.0.min.js"></script>
-  <script src="/assets/js/app.js"></script>
+
+  <script src="./assets/jquery/jquery-3.6.1.min.js"></script>
+  <script src="./assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+  <script src="./assets/bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
+  <script src="./assets/sweetalert/v2/sweetalert2.js"></script>
+  <script src="./assets/js/popper-v1.16.0.min.js"></script>
+  <script src="./assets/js/app.js"></script>
 
   <script>
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
@@ -268,7 +350,10 @@
         createCustomer: App.BASE_URL_CUSTOMER + "/create",
         editCustomer: App.BASE_URL_CUSTOMER + "/edit",
         deposit: App.BASE_URL_CUSTOMER + "/deposit",
-        withdraw: App.BASE_URL_CUSTOMER + "/withdraw"
+        withdraw: App.BASE_URL_CUSTOMER + "/withdraw",
+        delete: App.BASE_URL_CUSTOMER + "/delete",
+        transfer: App.BASE_URL_CUSTOMER + "/transfer",
+        getAllRecipients: App.BASE_URL_CUSTOMER + "/get-all-recipients-without-sender"
       },
       elements: {},
       loadData: {},
@@ -277,18 +362,23 @@
         elements: {},
         loadData: {},
         commands: {},
-      }
+      },
+      initializeEventControl: {}
     }
 
     let customer = new Customer();
     let deposit = new Deposit();
     let withdraw = new Withdraw();
+    let transfer = new Transfer();
+    let sender = new Sender();
+    let recipient = new Recipient();
 
     page.elements.tbCustomer = $("#tbCustomer tbody");
     page.elements.modalCreate = $("#modalCreate");
     page.elements.modalEdit = $("#modalEdit")
     page.elements.modalDeposit = $("#modalDeposit");
     page.elements.modalWithdraw = $("#modalWithdraw");
+    page.elements.modalTransfer = $("#modalTransfer");
 
     page.dialogs.elements.frmCreate = $("#frmCreate");
     page.dialogs.elements.fullNameCre = $("#fullNameCre");
@@ -318,6 +408,17 @@
     page.dialogs.elements.transactionAmountWd = $("#transactionAmountWd");
     page.dialogs.elements.btnWithdraw = $("#btnWithdraw");
 
+    page.dialogs.elements.frmTransfer = $("#frmTransfer");
+    page.dialogs.elements.senderIdTrf = $("#senderIdTrf");
+    page.dialogs.elements.fullNameTrf = $("#fullNameTrf");
+    page.dialogs.elements.emailTrf = $("#emailTrf");
+    page.dialogs.elements.balanceTrf = $("#balanceTrf");
+    page.dialogs.elements.recipientIdTrf = $("#recipientIdTrf");
+    page.dialogs.elements.transferAmountTrf = $("#transferAmountTrf");
+    page.dialogs.elements.feesTrf = $("#feesTrf");
+    page.dialogs.elements.transactionAmountTrf = $("#transactionAmountTrf");
+    page.dialogs.elements.btnTransfer = $("#btnTransfer");
+
     page.commands.getAllCustomers = () => {
       $.ajax({
         headers: {
@@ -335,6 +436,8 @@
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
 
       })
       .fail((jqXHR) => {
@@ -359,6 +462,28 @@
       });
     }
 
+    page.commands.getAllRecipients = (senderId) => {
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "GET",
+        url: page.urls.getAllRecipients + "/" + senderId
+      })
+      .done((data) => {
+        page.dialogs.elements.recipientIdTrf.empty();
+
+        data.map(item => {
+          let str = `<option value = "${item.id}">(${item.id}) - ${item.fullName}</option> `;
+          page.dialogs.elements.recipientIdTrf.append(str);
+        })
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
+      })
+    }
+
     $("#btnShowCreateModal").on("click", () => {
       $("#modalCreate").modal("show");
     });
@@ -379,6 +504,53 @@
       $("#frmWithdraw").trigger("submit");
     })
 
+    page.dialogs.elements.btnTransfer.on("click", () => {
+      page.dialogs.elements.frmTransfer.trigger("submit");
+    })
+
+    page.commands.handleChangeTransferAmountTrf = () => {
+      page.dialogs.elements.transferAmountTrf.on("input", function (){
+        let transferAmount = +$(this).val();
+        let fees = 10;
+        let feesAmount = transferAmount * fees / 100;
+        let transactionAmount = transferAmount + feesAmount;
+
+        page.dialogs.elements.transactionAmountTrf.val(transactionAmount);
+      })
+    }
+
+    page.commands.handleOpenModalTransfer = () => {
+      $(".transfer").on("click", function(){
+        let senderId = $(this).data("id");
+
+        page.commands.getCustomerById(senderId).then(() => {
+          page.commands.getAllRecipients(senderId);
+          page.dialogs.elements.senderIdTrf.val(customer.id);
+          page.dialogs.elements.fullNameTrf.val(customer.fullName);
+          page.dialogs.elements.emailTrf.val(customer.email);
+          page.dialogs.elements.balanceTrf.val(customer.balance);
+
+          page.elements.modalTransfer.modal("show");
+        })
+        .catch(() => {
+          App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404)
+        });
+      });
+    }
+
+    page.commands.handleDeleteCustomer = () => {
+      $("#tbCustomer tbody .delete").on("click", function(){
+        let customerId = $(this).data("id");
+
+        App.SweetAlert.showSuspendedConfirmDialog()
+        .then((result) => {
+          if(result.isConfirmed) {
+            page.commands.suspendedCustomer(customerId);
+          }
+        });  
+      })
+    }
+
     page.commands.handleOpenModalWithdraw = () => {
       $(".withdraw").on("click", function() {
         let customerId = $(this).data("id");
@@ -395,7 +567,6 @@
         });
       });
     }
-
 
     page.commands.handleOpenModalDeposit = () => {
       $(".deposit").on("click", function(){
@@ -434,6 +605,93 @@
       });
     }
 
+    page.commands.handleCloseModalWithdraw = () => {
+      page.elements.modalWithdraw.on("hidden.bs.modal", () => {
+        page.dialogs.elements.frmWithdraw[0].reset();
+        page.dialogs.elements.frmWithdraw.validate().resetForm();
+      })
+    }
+    page.commands.handleCloseModalTransfer = () => {
+      page.elements.modalTransfer.on("hidden.bs.modal", () => {
+        page.dialogs.elements.frmTransfer[0].reset();
+        page.dialogs.elements.frmTransfer.validate().resetForm();
+        page.dialogs.elements.modalTransferError.removeClass("show").addClass("hide");
+    })
+    }
+
+    page.commands.suspendedCustomer = (customerId) => {
+      $.ajax({
+        headers: {
+            "accept": "application/json",
+            "content-type": "application/json"
+        },
+        type: "DELETE",
+        url: page.urls.delete + "/" + customerId
+      })
+      .done(() => {
+        $("#tr_" + customerId).remove();
+        App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEACTIVATE);
+      })
+      .fail((jqXHR) => {
+        App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+      })
+    }
+
+    page.dialogs.commands.transferCustomer = () => {
+      transfer.id = 0;
+      transfer.senderId = page.dialogs.elements.senderIdTrf.val();
+      transfer.recipientId = page.dialogs.elements.recipientIdTrf.val();
+      transfer.transferAmount = page.dialogs.elements.transferAmountTrf.val();
+
+      $.ajax({
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+        },
+        type: "POST",
+        url: page.urls.transfer,
+        data: JSON.stringify(transfer)
+      })
+      .done((data) => {
+
+        sender = data.sender;
+        recipient = data.recipient;
+
+        page.dialogs.elements.balanceTrf.val(sender.balance);
+
+        let senderCurrentRow = $("#tr_" + sender.id);
+        senderCurrentRow.replaceWith(App.renderRowCustomer(sender));
+
+        let recipientCurrentRow = $("#tr_" + recipient.id);
+        recipientCurrentRow.replaceWith(App.renderRowCustomer(recipient));
+        
+        page.commands.removeEventOpenModal();
+        page.commands.handleOpenModalDeposit();
+        page.commands.handleOpenModalEdit();
+        page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
+
+        App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_TRANSFER);
+      })
+      .fail((jqXHR) => {
+        $("#modalTransfer .modal-body .modal-alert-danger").empty();
+
+        let str = "";
+        let message = jqXHR.responseJSON.message;
+        if(message){
+          str +=`<label id="messageTrf-error" class="error" for="messageTrf">${message}</label> `;
+        } else {
+          let errors = jqXHR.responseJSON;
+
+          $.each(errors, (key, value) => {
+            str +=  `<label id="${key}Trf-error" class="error" for="${key}Trf">${value}</label>`;
+          })
+        }
+        $("#modalTransfer .modal-body .modal-alert-danger").append(str).removeClass("hide").addClass("show");
+      })
+    }
+
     page.dialogs.commands.withdrawCustomer = () => {
       withdraw.id = 0;
       withdraw.customerId = page.dialogs.elements.customerIdWd.val();
@@ -456,6 +714,8 @@
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
 
         page.elements.modalWithdraw.modal("hide");
         App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_WITHDRAW);
@@ -487,6 +747,8 @@
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
 
         $("#modalDeposit").modal("hide");
         App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEPOSIT);
@@ -521,6 +783,8 @@
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
 
         page.elements.modalEdit.modal("hide");
         App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_UPDATED);
@@ -554,6 +818,8 @@
         page.commands.handleOpenModalEdit();
         page.commands.handleOpenModalDeposit();
         page.commands.handleOpenModalWithdraw();
+        page.commands.handleDeleteCustomer();
+        page.commands.handleOpenModalTransfer();
 
         page.elements.modalCreate.modal("hide");
       })
@@ -566,7 +832,44 @@
       $(".edit").off();
       $(".deposit").off();
       $(".withdraw").off();
+      $(".transfer").off();
     }
+
+    page.dialogs.elements.frmTransfer.validate({
+      onkeyup: function(element) {
+        $(element).valid()
+      },
+      onclick: false,
+      onfocusout: false,
+      rules: {
+        transferAmountTrf: {
+          required: true,
+          min: 500,
+          max: 1000000
+        }
+      },
+      messages: {
+        required: "Vui lòng nhập số tiền giao dịch đầy đủ",
+        min: "Số tiền giao dịch tối thiểu là {0}",
+        max: "Số tiền giao dịch tối đa là {0}"
+      },
+      errorLabelContainer: "#modalTransfer .modal-alert-danger",
+      errorPlacement: function (error, element) {
+        error.appendTo("#modalTransfer .modal-alert-danger");
+      },
+      showErrors: function(errorMap, errorList) {
+        if (this.numberOfInvalids() > 0) {
+          $("#modalTransfer .modal-alert-danger").removeClass("hide").addClass("show");
+        } else {
+          $("#modalTransfer .modal-alert-danger").removeClass("show").addClass("hide").empty();
+          $("#frmTransfer input.error").removeClass("error");
+        }
+        this.defaultShowErrors();
+      },
+      submitHandler: function () {
+        page.dialogs.commands.transferCustomer();
+      } 
+    });
 
     page.dialogs.elements.frmWithdraw.validate({
       rules: {
@@ -648,7 +951,22 @@
       }
     })
 
-    page.commands.getAllCustomers();
+    page.initializeEventControl = () => {
+      page.commands.handleChangeTransferAmountTrf();
+      page.commands.handleCloseModalWithdraw();
+      page.commands.handleCloseModalTransfer();
+    }
+
+    page.loadData = () => {
+      page.commands.getAllCustomers();
+    }
+
+    $(() =>{
+      page.loadData();
+      page.initializeEventControl();
+    })
+
+    
 
   </script>
 </body>

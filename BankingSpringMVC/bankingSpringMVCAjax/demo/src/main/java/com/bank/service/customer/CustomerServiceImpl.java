@@ -2,15 +2,19 @@ package com.bank.service.customer;
 
 import com.bank.model.Customer;
 import com.bank.model.Deposit;
+import com.bank.model.Transfer;
 import com.bank.model.Withdraw;
+import com.bank.model.dto.RecipientDTO;
 import com.bank.repository.CustomerRepository;
 import com.bank.repository.DepositRepository;
+import com.bank.repository.TransferRepository;
 import com.bank.repository.WithdrawRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 @Service
 @Transactional
@@ -22,6 +26,8 @@ public class CustomerServiceImpl implements ICustomerService{
 
     @Autowired
     private WithdrawRepository withdrawRepository;
+    @Autowired
+    private TransferRepository transferRepository;
     @Override
     public Iterable<Customer> findfAll() {
         return customerRepository.findAll();
@@ -92,6 +98,16 @@ public class CustomerServiceImpl implements ICustomerService{
     }
 
     @Override
+    public Customer transfer(Transfer transfer) {
+        customerRepository.reduceBalance(transfer.getTransactionAmount(), transfer.getSender().getId());
+        customerRepository.incrementBalance(transfer.getTransferAmount(), transfer.getRecipient().getId());
+        transferRepository.save(transfer);
+        Optional<Customer> newSender = customerRepository.findById(transfer.getSender().getId());
+
+        return newSender.get();
+    }
+
+    @Override
     public void incrementBalance(BigDecimal balance, Long id) {
        customerRepository.incrementBalance(balance, id);
     }
@@ -104,5 +120,15 @@ public class CustomerServiceImpl implements ICustomerService{
     @Override
     public Iterable<Customer> findAllByDeletedIsFalseAndByIdWithOutSender(Long id) {
         return customerRepository.findAllByDeletedIsFalseAndByIdWithOutSender(id);
+    }
+
+    @Override
+    public void softDelete(Long customerId) {
+        customerRepository.softDelete(customerId);
+    }
+
+    @Override
+    public List<RecipientDTO> getAllRecipientDTO(Long id) {
+        return customerRepository.getAllRecipientDTO(id);
     }
 }

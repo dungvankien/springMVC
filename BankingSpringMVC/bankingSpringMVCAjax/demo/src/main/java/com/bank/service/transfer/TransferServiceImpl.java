@@ -1,6 +1,7 @@
 package com.bank.service.transfer;
 
 import com.bank.model.Transfer;
+import com.bank.model.dto.TransferHistoryDTO;
 import com.bank.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 @Service
 @Transactional
@@ -41,5 +43,10 @@ public class TransferServiceImpl implements ITransferService{
     @Override
     public BigDecimal sumFeesAmount() {
         return transferRepository.sumFeesAmount();
+    }
+
+    @Override
+    public List<TransferHistoryDTO> getAllHistories() {
+        return transferRepository.getAllHistories();
     }
 }
