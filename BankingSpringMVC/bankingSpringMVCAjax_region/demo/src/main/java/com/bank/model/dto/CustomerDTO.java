@@ -1,5 +1,6 @@
 package com.bank.model.dto;
 
+import com.bank.model.LocationRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,6 @@ public class CustomerDTO {
         this.email = email;
         this.phone = phone;
         this.balance = balance;
-        this.locationRegion = locationRegion.to;
+        this.locationRegion = locationRegion.toLocationRegionDTO();
     }
 }

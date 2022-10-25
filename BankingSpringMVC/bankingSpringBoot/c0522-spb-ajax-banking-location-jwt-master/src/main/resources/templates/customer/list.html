@@ -90,7 +90,7 @@
                         </div>
                         <div class="col-lg-3">
                             <label>Ward</label>
-                            <select name="warIdCre" id="wardIdCre" class="form-control">
+                            <select name="wardIdCre" id="wardIdCre" class="form-control">
 
                             </select>
                         </div>
@@ -150,7 +150,7 @@
                         </div>
                         <div class="col-lg-3">
                             <label>Ward</label>
-                            <select name="warIdUp" id="wardIdUp" class="form-control">
+                            <select name="wardIdUp" id="wardIdUp" class="form-control">
 
                             </select>
                         </div>
@@ -333,7 +333,8 @@
             deposit: App.BASE_URL_CUSTOMER + "/deposit",
             withdraw: App.BASE_URL_CUSTOMER + "/withdraw",
             transfer: App.BASE_URL_CUSTOMER + "/transfer",
-            delete: App.BASE_URL_CUSTOMER + "/delete/"
+            delete: App.BASE_URL_CUSTOMER + "/delete/",
+            update: App.BASE_URL_CUSTOMER + "/update"
         },
         elements: {},
         loadData: {},
@@ -451,6 +452,7 @@
                 results.map(item => {
                     let str = `<option value="${item.province_id}">${item.province_name}</option>`;
                     page.dialogs.elements.provinceCre.append(str);
+                    page.dialogs.elements.provinceUp.append(str);
                 })
 
             })
@@ -471,12 +473,14 @@
             .done((data) => {
 
                 page.dialogs.elements.districtCre.empty();
+                page.dialogs.elements.districtUp.empty();
 
                 let results = data.results;
 
                 results.map(item => {
                     let str = `<option value="${item.district_id}">${item.district_name}</option>`;
                     page.dialogs.elements.districtCre.append(str);
+                    page.dialogs.elements.districtUp.append(str);
                 })
             })
             .fail((xqXHR) => {
@@ -485,7 +489,7 @@
     }
 
     page.commands.getAllWardsByDistrictId = (districtId) => {
-        $.ajax({
+        return $.ajax({
             headers: {
                 "accept": "application/json",
                 "content-type": "application/json"
@@ -495,12 +499,14 @@
         })
             .done((data) => {
                 page.dialogs.elements.wardCre.empty();
+                page.dialogs.elements.wardUp.empty();
 
                 let results = data.results;
 
                 results.map(item => {
                     let str = `<option value="${item.ward_id}">${item.ward_name}</option>`;
                     page.dialogs.elements.wardCre.append(str);
+                    page.dialogs.elements.wardUp.append(str);
                 })
             })
             .fail((xqXHR) => {
@@ -561,6 +567,9 @@
     $("#btnDeposit").on("click", () => {
         $("#frmDeposit").trigger("submit");
     })
+    page.dialogs.elements.btnUpdate.on("click", () => {
+        page.dialogs.elements.frmUpdate.trigger("submit");
+    })
 
     page.dialogs.elements.btnWithdraw.on("click", () => {
         page.dialogs.elements.frmWithdraw.trigger("submit");
@@ -586,10 +595,49 @@
         page.commands.getAllWardsByDistrictId(districtId);
     })
 
+    //Update
+
+    page.dialogs.elements.provinceUp.on("change", function () {
+        let provinceId = $(this).val();
+
+        page.commands.getAllDistrictsByProvinceId(provinceId).then(() => {
+            let districtId = page.dialogs.elements.districtUp.val();
+            page.commands.getAllWardsByDistrictId(districtId);
+        });
+    });
+
+    page.dialogs.elements.districtUp.on("change", function () {
+        let districtId = $(this).val();
+        page.commands.getAllWardsByDistrictId(districtId);
+    })
+
 
     page.commands.handleOpenModalUpdate = () => {
         page.elements.footer.find(".update").on("click", () => {
-            page.elements.modalUpdate.modal("show");
+            let customerId = page.elements.currentRow.val();
+            page.commands.getCustomerById(customerId).then(() => {
+                page.dialogs.elements.fullNameUp.val(customer.fullName);
+                page.dialogs.elements.emailUp.val(customer.email);
+                page.dialogs.elements.phoneUp.val(customer.phone);
+
+                page.dialogs.elements.provinceUp.val(customer.locationRegion.provinceId);
+
+                page.dialogs.elements.districtUp.empty();
+                page.commands.getAllDistrictsByProvinceId(customer.locationRegion.provinceId).then(() => {
+                    page.dialogs.elements.districtUp.val(customer.locationRegion.districtId);
+
+                    page.dialogs.elements.wardUp.empty();
+                    page.commands.getAllWardsByDistrictId(customer.locationRegion.districtId).then(() => {
+                        page.dialogs.elements.wardUp.val(customer.locationRegion.wardId);
+                    })
+                })
+                page.dialogs.elements.addressUp.val(customer.locationRegion.address);
+                page.elements.modalUpdate.modal("show");
+            })
+                .catch(() => {
+                    console.log("get edit fail");
+                    App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+                });
         });
     }
 
@@ -722,7 +770,8 @@
             data: JSON.stringify(customer)
         })
             .done((data) => {
-                // page.elements.tbCustomer.prepend(App.renderRowCustomer(data));
+
+                page.elements.tbCustomer.prepend(App.renderRowCustomer(data, data.locationRegion));
 
 
                 page.commands.removeEventOpenModal();
@@ -730,9 +779,60 @@
                 page.commands.handleOpenModalWithdraw();
                 page.commands.handleOpenModalTransfer();
                 page.commands.handleDeleteCustomer();
+                page.commands.handleShowFooterButton();
 
                 page.commands.initTooltip();
                 page.elements.modalCreate.modal("hide");
+
+                App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_CREATED);
+
+            })
+            .fail((jqXHR) => {
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+            })
+    }
+
+    page.commands.updateCustomer = () => {
+
+        locationRegion.id = customer.locationRegion.id;
+        locationRegion.provinceId = page.dialogs.elements.provinceUp.val();
+        locationRegion.provinceName = page.dialogs.elements.provinceUp.find("option:selected").text();
+        locationRegion.districtId = page.dialogs.elements.districtUp.val();
+        locationRegion.districtName = page.dialogs.elements.districtUp.find("option:selected").text();
+        locationRegion.wardId = page.dialogs.elements.wardUp.val();
+        locationRegion.wardName = page.dialogs.elements.wardUp.find("option:selected").text();
+        locationRegion.address = page.dialogs.elements.addressUp.val();
+
+        customer.id = page.elements.currentRow.val();
+        customer.fullName = page.dialogs.elements.fullNameUp.val();
+        customer.email = page.dialogs.elements.emailUp.val();
+        customer.phone = page.dialogs.elements.phoneUp.val();
+        customer.locationRegion = locationRegion;
+
+        console.log(customer);
+
+        $.ajax({
+            headers: {
+                "accept": "application/json",
+                "content-type": "application/json"
+            },
+            type: "POST",
+            url: page.urls.update,
+            data: JSON.stringify(customer)
+        })
+            .done((data) => {
+                let currentRow = $("#tr_" + data.id);
+                currentRow.replaceWith(App.renderRowCustomer(data, data.locationRegion));
+
+                page.commands.removeEventOpenModal();
+                page.commands.handleOpenModalDeposit();
+                page.commands.handleOpenModalWithdraw();
+                page.commands.handleOpenModalTransfer();
+                page.commands.handleDeleteCustomer();
+                page.commands.handleShowFooterButton();
+
+                page.commands.initTooltip();
+                page.elements.modalUpdate.modal("hide");
 
                 App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_CREATED);
 
@@ -901,6 +1001,26 @@
         },
         submitHandler: function () {
             page.commands.createCustomer();
+        }
+    })
+
+    page.dialogs.elements.frmUpdate.validate({
+        rules: {
+            fullNameEdit: {
+                required: true,
+                minlength: 5,
+                maxlength: 50
+            }
+        },
+        messages: {
+            fullNameEdit: {
+                required: "Vui lòng nhập tên đầy đủ",
+                minlength: "Họ tên tối thiểu 5 ký tự",
+                maxlength: "Họ tên tối đa 50 ký tự"
+            }
+        },
+        submitHandler: function(){
+            page.commands.updateCustomer();
         }
     })
 

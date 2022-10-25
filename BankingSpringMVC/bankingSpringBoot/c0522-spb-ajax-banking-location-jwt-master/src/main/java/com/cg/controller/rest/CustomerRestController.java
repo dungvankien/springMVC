@@ -90,6 +90,18 @@ public class CustomerRestController {
         return new ResponseEntity<>(newCustomer.toCustomerCreateDTO(), HttpStatus.CREATED);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<CustomerCreateDTO> update(@RequestBody CustomerCreateDTO customerDTO) {
+
+        Customer customer = customerDTO.toCustomer();
+
+        Customer newCustomer = customerService.save(customer);
+
+        customerDTO.setId(newCustomer.getId());
+
+        return new ResponseEntity<>(newCustomer.toCustomerCreateDTO(), HttpStatus.CREATED);
+    }
+
     @PostMapping("/deposit")
     public ResponseEntity<CustomerDTO> deposit(@RequestBody DepositDTO depositDTO) {
 
