@@ -328,7 +328,7 @@
         urls: {
             getAllCustomers: App.BASE_URL_CUSTOMER,
             getCustomerById: App.BASE_URL_CUSTOMER,
-            getAllRecipients: App.BASE_URL_CUSTOMER + "/get-all-recipients-without-sender/",
+            getAllRecipients: App.BASE_URL_CUSTOMER + "/get-all-recipients-without-sender",
             createCustomer: App.BASE_URL_CUSTOMER + "/create",
             deposit: App.BASE_URL_CUSTOMER + "/deposit",
             withdraw: App.BASE_URL_CUSTOMER + "/withdraw",
@@ -383,6 +383,13 @@
     page.dialogs.elements.wardUp = $("#wardIdUp");
     page.dialogs.elements.addressUp = $("#addressUp");
     page.dialogs.elements.btnUpdate = $("#btnUpdate");
+
+    page.dialogs.elements.frmDeposit = $("#frmDeposit");
+    page.dialogs.elements.customerIdDep = $("#customerIdDep");
+    page.dialogs.elements.fullNameDep = $("#fullNameDep");
+    page.dialogs.elements.balanceDep = $("#balanceDep");
+    page.dialogs.elements.transactionAmountDep = $("#transactionAmountDep");
+    page.dialogs.elements.btnDeposit = $("#btnDeposit");
 
     page.dialogs.elements.modalWithdraw = $("#modalWithdraw");
     page.dialogs.elements.frmWithdraw = $("#frmWithdraw");
@@ -642,26 +649,26 @@
     }
 
     page.commands.handleOpenModalDeposit = () => {
-        $(".deposit").on("click", function () {
-            let customerId = $(this).data("id");
+        page.elements.footer.find(".deposit").on("click", () => {
+            let customerId = page.elements.currentRow.val();
 
             page.commands.getCustomerById(customerId).then(() => {
-                $("#customerIdDep").val(customer.id);
-                $("#fullNameDep").val(customer.fullName);
-                $("#balanceDep").val(customer.balance);
+                page.dialogs.elements.customerIdDep.val(customer.id);
+                page.dialogs.elements.fullNameDep.val(customer.fullName);
+                page.dialogs.elements.balanceDep.val(customer.balance);
 
-                $("#modalDeposit").modal("show");
+                page.elements.modalDeposit.modal("show");
             })
-                .catch(() => {
-                    console.log("get deposit fail");
-                    App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
-                });
+            .catch(() => {
+                console.log("get deposit fail");
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+            });
         });
     }
 
     page.commands.handleOpenModalWithdraw = () => {
-        $(".withdraw").on("click", function () {
-            let customerId = $(this).data("id");
+        page.elements.footer.find(".withdraw").on("click", function () {
+            let customerId = page.elements.currentRow.val();
 
             page.commands.getCustomerById(customerId).then(() => {
                 page.dialogs.elements.customerIdWd.val(customer.id);
@@ -677,8 +684,8 @@
     }
 
     page.commands.handleOpenModalTransfer = () => {
-        $(".transfer").on("click", function () {
-            let senderId = $(this).data("id");
+        page.elements.footer.find(".transfer").on("click", function () {
+            let senderId = page.elements.currentRow.val();
 
             page.commands.getCustomerById(senderId).then(() => {
                 page.commands.getAllRecipients(senderId);
@@ -711,15 +718,15 @@
     }
 
     page.commands.handleDeleteCustomer = () => {
-        $("#tbCustomer tbody .delete").on("click", function () {
-            let customerId = $(this).data("id");
+        page.elements.footer.find(".delete").on("click", function () {
+            let customerId = page.elements.currentRow.val();
 
             App.SweetAlert.showSuspendedConfirmDialog()
                 .then((result) => {
                     if (result.isConfirmed) {
                         page.commands.suspendedCustomer(customerId);
                     }
-                });
+            });
         })
     }
 
@@ -859,14 +866,16 @@
             .done((data) => {
                 let currentRow = $("#tr_" + data.id);
 
-                currentRow.replaceWith(App.renderRowCustomer(data));
+                currentRow.replaceWith(App.renderRowCustomer(data, data.locationRegion));
 
                 page.commands.removeEventOpenModal();
                 page.commands.handleOpenModalDeposit();
                 page.commands.handleOpenModalWithdraw();
                 page.commands.handleOpenModalTransfer();
                 page.commands.handleDeleteCustomer();
+                page.commands.handleShowFooterButton();
 
+                App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEPOSIT)
                 $("#modalDeposit").modal("hide");
             })
             .fail((jqXHR) => {
@@ -891,13 +900,14 @@
             .done((data) => {
                 let currentRow = $("#tr_" + data.id);
 
-                currentRow.replaceWith(App.renderRowCustomer(data));
+                currentRow.replaceWith(App.renderRowCustomer(data, data.locationRegion));
 
                 page.commands.removeEventOpenModal();
                 page.commands.handleOpenModalDeposit();
                 page.commands.handleOpenModalWithdraw();
                 page.commands.handleOpenModalTransfer();
                 page.commands.handleDeleteCustomer();
+                page.commands.handleShowFooterButton();
 
                 page.dialogs.elements.modalWithdraw.modal("hide");
                 App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_WITHDRAW);
@@ -930,16 +940,17 @@
                 page.dialogs.elements.balanceTrf.val(sender.balance);
 
                 let senderCurrentRow = $("#tr_" + sender.id);
-                senderCurrentRow.replaceWith(App.renderRowCustomer(sender));
+                senderCurrentRow.replaceWith(App.renderRowCustomer(sender, sender.locationRegion));
 
                 let recipientCurrentRow = $("#tr_" + recipient.id);
-                recipientCurrentRow.replaceWith(App.renderRowCustomer(recipient));
+                recipientCurrentRow.replaceWith(App.renderRowCustomer(recipient, recipient.locationRegion));
 
                 page.commands.removeEventOpenModal();
                 page.commands.handleOpenModalDeposit();
                 page.commands.handleOpenModalWithdraw();
                 page.commands.handleOpenModalTransfer();
                 page.commands.handleDeleteCustomer();
+                page.commands.handleShowFooterButton();
 
                 // page.dialogs.elements.modalTransfer.modal("hide");
                 App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_TRANSFER);
@@ -1132,6 +1143,11 @@
             page.elements.footer.append(App.renderFooterButton());
 
             page.commands.handleOpenModalUpdate();
+            page.commands.handleOpenModalDeposit();
+            page.commands.handleOpenModalWithdraw();
+            page.commands.handleOpenModalTransfer();
+            page.commands.handleDeleteCustomer();
+
         })
     }
 

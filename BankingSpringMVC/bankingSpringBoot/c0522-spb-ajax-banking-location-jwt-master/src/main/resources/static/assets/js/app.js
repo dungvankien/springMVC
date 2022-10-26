@@ -124,6 +124,22 @@ class App {
                 <i class="fas fa-pencil-alt"></i>
                 Update
             </button>
+            <button class="btn btn-success deposit">
+                <i class="fas fa-plus"></i>
+                Deposit
+            </button>
+            <button class="btn btn-warning withdraw">
+                 <i class="fas fa-minus"></i>
+                Withdraw
+            </button>
+             <button class="btn btn-primary transfer">
+                <i class="fas fa-exchange-alt"></i>
+                Transfer
+            </button>
+             <button class="btn btn-danger delete">
+                <i class="fas fa-trash-alt"></i>
+                Delete
+            </button>
         `;
 
         return str;

@@ -155,13 +155,10 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public Customer save(Customer customer) {
-
         LocationRegion locationRegion = customer.getLocationRegion();
         locationRegion.setId(0L);
         LocationRegion newLocationRegion = locationRegionRepository.save(locationRegion);
-
         customer.setLocationRegion(newLocationRegion);
-
         return customerRepository.save(customer);
     }
 
