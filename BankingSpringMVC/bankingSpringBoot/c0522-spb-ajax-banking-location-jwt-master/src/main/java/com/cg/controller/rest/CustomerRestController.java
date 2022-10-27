@@ -12,6 +12,7 @@ import com.cg.util.AppUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -89,7 +90,7 @@ public class CustomerRestController {
 
         return new ResponseEntity<>(newCustomer.toCustomerCreateDTO(), HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/update")
     public ResponseEntity<CustomerCreateDTO> update(@RequestBody CustomerCreateDTO customerDTO) {
 
@@ -211,7 +212,7 @@ public class CustomerRestController {
             throw new DataInputException("Vui lòng liên hệ Administrator");
         }
     }
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @DeleteMapping("/delete/{customerId}")
     public ResponseEntity<CustomerDTO> delete(@PathVariable long customerId) {
 
