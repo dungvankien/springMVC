@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>List of products</title>
+    <th:block th:replace="layout/head"/>
+    <link rel="stylesheet" href="/assets/css/upload.css">
+    <style>
+        .fl {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <div class="row">
+                <div class="col-sm-5">
+                    <h1>List of products</h1>
+                </div>
+                <div class="col-sm-7">
+                    <button id="btnShowCreateModal" class="btn btn-outline-light">
+                        <i class="fas fa-plus"></i>
+                        <span>Add New Product</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <input type="hidden" id="currentRow">
+            <table id="tbProduct" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name Product</th>
+                    <th>Amount</th>
+                    <th>Price</th>
+                    <th>Describe</th>
+                    <th>Avatar</th>
+                    <th colspan="2">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="footer" class="footer"></div>
+
+    <th:block th:replace="/product/modalCreate :: modalCreate"/>
+
+    <th:block th:replace="layout/script" />
+
+<script>
+
+    let page = {
+        urls: {
+            getAllProducts: App.BASE_URL_PRODUCT,
+            getProductById: App.BASE_URL_PRODUCT,
+            create: App.BASE_URL_PRODUCT + "/create",
+            update: App.BASE_URL_PRODUCT + "/update",
+            delete: App.BASE_URL_PRODUCT + "/delete/"
+        },
+        elements: {},
+        loadData: {},
+        commands: {},
+        dialogs: {
+            elements: {},
+            loadData: {},
+            commands: {},
+        },
+        initializeEventControl: {}
+    }
+
+    let product = new Product();
+
+    page.elements.tbProduct = $("#tbProduct tbody");
+    page.elements.btnShowCreateModal = $("#btnShowCreateModal");
+    page.elements.modalCreate = $("#modalCreate");
+
+    page.dialogs.elements.frmCreate = $("#frmCreate");
+    page.dialogs.elements.nameCre = $("#nameCre");
+    page.dialogs.elements.amountCre = $("#amountCre");
+    page.dialogs.elements.priceCre = $("#priceCre");
+    page.dialogs.elements.descriptionCre = $("#descriptionCre");
+    // page.dialogs.elements.avatarCre = $("#avatarCre");
+    page.dialogs.elements.btnCreate = $("#btnCreate");
+
+    page.dialogs.elements.wrapper = $("section .wrapper");
+    page.dialogs.elements.imageFile = $("#imageFile");
+    page.dialogs.elements.wrapperContent = $("section .wrapper .content");
+    page.dialogs.elements.imagePreview = $("section .image-preview canvas");
+    page.dialogs.elements.canvas = $("#canvas");
+    page.dialogs.elements.context = page.dialogs.elements.canvas[0].getContext('2d');
+    page.dialogs.elements.imagePreview.css("display", "none");
+    page.dialogs.elements.divImagePreview = $("div.image-preview, div.file-name");
+    page.dialogs.elements.btnClearImagePreview = $(".clear-image-preview i");
+
+    page.dialogs.elements.btnCreate.on("click", () => {
+        page.dialogs.elements.frmCreate.trigger("submit");
+    })
+
+    page.elements.btnShowCreateModal.on("click", () => {
+        page.elements.modalCreate.modal("show");
+    });
+
+    page.commands.getAllProducts = () => {
+        $.ajax({
+            headers: {
+                "accept": "application/json",
+                "content-type": "application/json"
+            },
+            type: "GET",
+            url: page.urls.getAllProducts
+        })
+        .done((data) => {
+            data.map(item => {
+                page.elements.tbProduct.prepend(App.renderRowProduct(item));
+            });
+            page.commands.initTooltip();
+        })
+        .fail((jqXHR) => {
+            App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
+        })
+    }
+
+    page.commands.getProductById = (productId) => {
+        return $.ajax({
+            headers: {
+                "accept": "application/json",
+                "content-type": "application/json"
+            },
+            type: "GET",
+            url: page.urls.getProductById + "/" + productId
+        })
+            .done((data) => {
+                product = data;
+            })
+            .fail((jqXHR) => {
+                console.log("jqXHR ======");
+                console.log(jqXHR);
+            });
+    }
+
+    //Upload file ảnh
+
+    page.commands.createProduct = () => {
+        product.id = 0;
+        product.name = page.dialogs.elements.nameCre.val();
+        product.amount = page.dialogs.elements.amountCre.val();
+        product.price = page.dialogs.elements.priceCre.val();
+        product.description = page.dialogs.elements.descriptionCre.val();
+
+        let formData = new FormData();
+        formData.append("name", page.dialogs.elements.nameCre.val().toString());
+        formData.append("amount", page.dialogs.elements.amountCre.val().toString());
+        formData.append("price", page.dialogs.elements.priceCre.val().toString());
+        formData.append("description",  page.dialogs.elements.descriptionCre.val().toString());
+        formData.append("file", page.dialogs.elements.imageFile[0].files[0]);
+        $.ajax({
+            type: "POST",
+            contentType: false,
+            cache: false,
+            processData: false,
+            url: page.urls.create,
+            data: formData
+        }).done((data) => {
+            console.log(data)
+            // product = data;
+            //
+            // page.commands.addRow();
+            //
+            App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_CREATED);
+            //
+            // page.dialogs.elements.modalCreateProduct.modal('hide');
+            //
+            // page.commands.handleImagePopup();
+
+        }).fail((err) => {
+            console.log(err)
+            App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_400);
+        }).always(function () {
+            // page.element.loader.addClass("hide");
+            // page.element.btnSave.prop('disabled', false);
+        });
+
+
+    }
+
+    page.dialogs.commands.loadImageToCanvas = (imageFile) => {
+        page.dialogs.elements.imagePreview.css("display", "");
+        page.dialogs.elements.wrapper.addClass("active");
+        page.dialogs.elements.wrapperContent.css("opacity", 0);
+
+        let imageObj = new Image();
+
+        imageObj.onload = function () {
+            page.dialogs.elements.context.canvas.width = imageObj.width;
+            page.dialogs.elements.context.canvas.height = imageObj.height;
+            page.dialogs.elements.context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+        };
+
+        imageObj.src = URL.createObjectURL(imageFile)
+    }
+
+    page.dialogs.commands.changeImagePreview = () => {
+        let imageFile = page.dialogs.elements.imageFile[0].files[0];
+
+        if (imageFile) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(imageFile);
+
+            reader.onload = function(e){
+                if (e.target.readyState === FileReader.DONE) {
+                    page.dialogs.commands.loadImageToCanvas(imageFile);
+                }
+            }
+        } else {
+            page.dialogs.elements.clearImagePreview();
+        }
+    }
+
+    page.dialogs.elements.frmCreate.validate({
+        rules: {
+            nameCre: {
+                required: true,
+                minlength: 5,
+                maxlength: 35
+            }
+        },
+        messages: {
+            nameCre: {
+                required: "Vui lòng nhập tên đầy đủ",
+                minlength: "Họ tên tối thiểu 5 ký tự",
+                maxlength: "Họ tên tối đa 35 ký tự"
+            }
+        },
+        submitHandler: function () {
+            page.commands.createProduct();
+        }
+    })
+
+    page.commands.initTooltip = () => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    }
+
+    page.initializeEventControl = () => {
+        page.dialogs.elements.divImagePreview.on("click", function () {
+            page.dialogs.elements.imageFile.trigger("click");
+        });
+
+        page.dialogs.elements.imageFile.on("change", function () {
+            page.dialogs.commands.changeImagePreview();
+        });
+
+    }
+
+    page.loadData = () => {
+        page.commands.getAllProducts();
+    }
+
+    $(() => {
+        page.loadData();
+
+        page.initializeEventControl();
+    })
+
+</script>
+</body>
+</html>

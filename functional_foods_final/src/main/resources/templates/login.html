@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/assets/izitoast/v1.4.0/iziToast-1.4.0.min.css">
+    <link rel="stylesheet" href="/assets/css/login.css">
+</head>
+<body>
+    <div class="login-wrap">
+        <div class="login-html">
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+            <div class="login-form">
+                <div class="sign-in-htm">
+                    <div class="group">
+                        <label for="emailLogin" class="label">Username</label>
+                        <input id="emailLogin" type="text" class="input">
+                    </div>
+                    <div class="group">
+                        <label for="passwordLogin" class="label">Password</label>
+                        <input id="passwordLogin" type="password" class="input" data-type="password">
+                    </div>
+                    <div class="group">
+                        <input id="check" type="checkbox" class="check" checked>
+                        <label for="check"><span class="icon"></span> Keep me Signed in</label>
+                    </div>
+                    <div class="group">
+                        <input id="btnLogin" type="submit" class="button" value="Sign In">
+                    </div>
+                    <div class="hr"></div>
+                    <div class="foot-lnk">
+                        <a href="#forgot">Forgot Password?</a>
+                    </div>
+                </div>
+                <div class="sign-up-htm">
+                    <div class="group">
+                        <label for="fullName" class="label">Full Name</label>
+                        <input id="fullName" type="text" class="input">
+                    </div>
+                    <div class="group">
+                        <label for="phone" class="label">Phone</label>
+                        <input id="phone" type="tel" class="input">
+                    </div>
+                    <div class="group">
+                        <label for="address" class="label">Address</label>
+                        <input id="address" type="email" class="input">
+                    </div>
+                    <div class="group">
+                        <label for="emailSignUp" class="label">Email</label>
+                        <input id="emailSignUp" type="email" class="input">
+                    </div>
+                    <div class="group">
+                        <label for="passSignUp" class="label">Password</label>
+                        <input id="passSignUp" type="password" class="input" data-type="password">
+                    </div>
+
+                    <div class="group">
+                        <label for="repeatpass" class="label">Repeat Password</label>
+                        <input id="repeatpass" type="password" class="input" data-type="password">
+                    </div>
+                    <div class="group">
+                        <input id="btnSignUp" type="submit" class="button" value="Sign Up">
+                    </div>
+                    <div class="hr"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/assets/jquery/jquery-v3.6.0.min.js"></script>
+    <script type="text/javascript" src="/assets/izitoast/v1.4.0/iziToast-1.4.0.js"></script>
+    <script src="/assets/js/app.js"></script>
+
+    <script>
+        let page = {
+            urls: {
+                login: App.BASE_URL_LOGIN + "/login",
+                register: App.BASE_URL_LOGIN + "/register",
+            },
+            elements: {},
+            commands: {},
+            initializeEventControl: {}
+        }
+        page.elements.emailLogin = $("#emailLogin");
+        page.elements.passwordLogin = $("#passwordLogin");
+        page.elements.btnLogin = $("#btnLogin");
+
+        page.elements.fullName = $("#fullName");
+        page.elements.phone = $("#phone");
+        page.elements.address = $("#address");
+        page.elements.emailSignUp = $("#emailSignUp");
+        page.elements.passwordSignUp = $("#passSignUp");
+        page.elements.repeatpass = $("#repeatpass");
+        page.elements.btnSignUp = $("#btnSignUp");
+
+        page.commands.createSignUp = () => {
+            let user = {
+                "username": page.elements.emailSignUp.val(),
+                "password": page.elements.passwordSignUp.val(),
+                "fullName": page.elements.fullName.val(),
+                "address": page.elements.address.val(),
+                "phone": page.elements.phone.val(),
+                "role": {
+                    "id": 2
+                },
+            };
+            if((page.elements.passwordSignUp.val()) == (page.elements.repeatpass.val())){
+                $.ajax({
+                    headers: {
+                        "accept": "application/json",
+                        "content-type": "application/json"
+                    },
+                    type: "POST",
+                    url: page.urls.register,
+                    data: JSON.stringify(user)
+                })
+                .done(() => {
+                    App.IziToast.showSuccessAlert("Successful!");
+                })
+                .fail(() => {
+                    App.IziToast.showErrorAlert("Error!")
+                })
+            } else {
+                App.IziToast.showErrorAlert("Error! Check password ")
+            }
+        }
+
+        page.commands.login = () => {
+            let user = {
+                "username": page.elements.emailLogin.val(),
+                "password": page.elements.passwordLogin.val(),
+            }
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: page.urls.login,
+                data: JSON.stringify(user)
+            })
+                .done(() => {
+                    App.IziToast.showSuccessAlert("Successful!");
+                    console.log("123334444");
+                    setTimeout(() => {
+                        window.location.href = "/products";
+                    }, 150)
+                })
+                .fail(() => {
+                    App.IziToast.showErrorAlert("Error!")
+                })
+
+        }
+
+        page.initializeEventControl = () => {
+            page.elements.btnSignUp.on("click", () => {
+                page.commands.createSignUp();
+            })
+
+            page.elements.btnLogin.on("click", () => {
+                page.commands.login();
+            })
+        }
+        $(() => {
+            page.initializeEventControl();
+        })
+    </script>
+</body>
+</html>
