@@ -2,13 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>List of products</title>
-    <th:block th:replace="layout/head"/>
     <link rel="stylesheet" href="/assets/css/upload.css">
     <style>
         .fl {
             float: left;
         }
     </style>
+    <th:block th:replace="layout/head"/>
 </head>
 <body>
     <div class="main-container">
@@ -49,6 +49,7 @@
     <div id="footer" class="footer"></div>
 
     <th:block th:replace="/product/modalCreate :: modalCreate"/>
+    <th:block th:replace="/product/modalUpdate :: modalUpdate"/>
 
     <th:block th:replace="layout/script" />
 
@@ -73,19 +74,27 @@
         initializeEventControl: {}
     }
 
+    let avatar = new Avatar();
     let product = new Product();
 
     page.elements.tbProduct = $("#tbProduct tbody");
     page.elements.btnShowCreateModal = $("#btnShowCreateModal");
     page.elements.modalCreate = $("#modalCreate");
+    page.elements.modalUpdate = $("#modalUpdate");
 
     page.dialogs.elements.frmCreate = $("#frmCreate");
     page.dialogs.elements.nameCre = $("#nameCre");
     page.dialogs.elements.amountCre = $("#amountCre");
     page.dialogs.elements.priceCre = $("#priceCre");
     page.dialogs.elements.descriptionCre = $("#descriptionCre");
-    // page.dialogs.elements.avatarCre = $("#avatarCre");
     page.dialogs.elements.btnCreate = $("#btnCreate");
+
+    page.dialogs.elements.frmUpdate = $("#frmUpdate");
+    page.dialogs.elements.nameUp = $("#nameUp");
+    page.dialogs.elements.amountUp = $("#amountUp");
+    page.dialogs.elements.priceUp = $("#priceUp");
+    page.dialogs.elements.descriptionUp = $("#descriptionUp");
+    page.dialogs.elements.btnUpdate = $("#btnUpdate");
 
     page.dialogs.elements.wrapper = $("section .wrapper");
     page.dialogs.elements.imageFile = $("#imageFile");
@@ -101,9 +110,75 @@
         page.dialogs.elements.frmCreate.trigger("submit");
     })
 
+    page.dialogs.elements.btnUpdate.on("click", () => {
+        page.dialogs.elements.frmUpdate.trigger("submit");
+    })
+
     page.elements.btnShowCreateModal.on("click", () => {
         page.elements.modalCreate.modal("show");
     });
+
+    page.commands.handleOpenConfirmDelete = () => {
+        $(".delete").on("click", function () {
+
+            let productId = $(this).data("id");;
+
+            App.SweetAlert.showSuspendedConfirmDialog()
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        page.dialogs.commands.deactivateProduct(productId);
+                    }
+                });
+        });
+    }
+    page.dialogs.commands.deactivateProduct = (productId) => {
+        $.ajax({
+            headers: {
+                "accept": "application/json",
+                "content-type": "application/json"
+            },
+            type: "DELETE",
+            url: page.urls.delete + productId
+        })
+            .done(() => {
+                App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_DEACTIVATE);
+                $("#tr_" + productId).remove();
+            })
+            .fail((jqXHR) => {
+                console.log("jqXHR deactivateCustomer ======");
+                console.log(jqXHR);
+
+                if (jqXHR.status === 401) {
+                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_401);
+                }
+
+                if (jqXHR.status === 403) {
+                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_403);
+                }
+                else {
+                    App.IziToast.showErrorAlert("Xóa thất bại");
+                }
+            });
+    }
+
+    page.commands.handleOpenModalUpdate = () => {
+        $(".edit").on("click", function (){
+            let productId = $(this).data("id");
+
+            page.commands.getProductById(productId).then(() => {
+                page.dialogs.elements.nameUp.val(product.name);
+                page.dialogs.elements.amountUp.val(product.amount);
+                page.dialogs.elements.priceUp.val(product.price);
+                page.dialogs.elements.descriptionUp.val(product.description);
+
+                page.elements.modalUpdate.modal("show");
+            })
+            .catch(() => {
+                console.log("get edit fail");
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+            });
+        })
+    }
 
     page.commands.getAllProducts = () => {
         $.ajax({
@@ -116,9 +191,12 @@
         })
         .done((data) => {
             data.map(item => {
-                page.elements.tbProduct.prepend(App.renderRowProduct(item));
+                avatar = item.avatar
+                page.elements.tbProduct.prepend(App.renderRowProduct(item, avatar));
             });
             page.commands.initTooltip();
+            page.commands.handleOpenModalUpdate();
+            page.commands.handleOpenConfirmDelete();
         })
         .fail((jqXHR) => {
             App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
@@ -146,12 +224,6 @@
     //Upload file ảnh
 
     page.commands.createProduct = () => {
-        product.id = 0;
-        product.name = page.dialogs.elements.nameCre.val();
-        product.amount = page.dialogs.elements.amountCre.val();
-        product.price = page.dialogs.elements.priceCre.val();
-        product.description = page.dialogs.elements.descriptionCre.val();
-
         let formData = new FormData();
         formData.append("name", page.dialogs.elements.nameCre.val().toString());
         formData.append("amount", page.dialogs.elements.amountCre.val().toString());
@@ -166,26 +238,50 @@
             url: page.urls.create,
             data: formData
         }).done((data) => {
-            console.log(data)
-            // product = data;
-            //
-            // page.commands.addRow();
-            //
-            App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_CREATED);
-            //
-            // page.dialogs.elements.modalCreateProduct.modal('hide');
-            //
-            // page.commands.handleImagePopup();
+            page.elements.tbProduct.prepend(App.renderRowProduct(data, data.avatar));
 
+            page.commands.initTooltip();
+            page.commands.handleOpenModalUpdate();
+            page.commands.handleOpenConfirmDelete();
+
+            App.IziToast.showSuccessAlert("successfully!!")
+            // page.elements.modalCreate.modal('hide');
         }).fail((err) => {
             console.log(err)
-            App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_400);
-        }).always(function () {
-            // page.element.loader.addClass("hide");
-            // page.element.btnSave.prop('disabled', false);
+            App.IziToast.showErrorAlert("ERROR_400");
         });
+    }
 
+    page.commands.updateProduct = () => {
+        let formData = new FormData();
+        formData.append("id",product.id.toString());
+        formData.append("name", page.dialogs.elements.nameUp.val().toString());
+        formData.append("amount", page.dialogs.elements.amountUp.val().toString());
+        formData.append("price", page.dialogs.elements.priceUp.val().toString());
+        formData.append("description",  page.dialogs.elements.descriptionUp.val().toString());
+        formData.append("file", page.dialogs.elements.imageFile[0].files[0]);
+        $.ajax({
+            type: "POST",
+            contentType: false,
+            cache: false,
+            processData: false,
+            url: page.urls.update,
+            data: formData
+        }).done((data) => {
 
+            let currentRow = $("#tr_" + data.id)
+            currentRow.replaceWith(App.renderRowProduct(data, data.avatar));
+
+            page.commands.initTooltip();
+            page.commands.handleOpenModalUpdate();
+            page.commands.handleOpenConfirmDelete();
+
+            App.IziToast.showSuccessAlert("successfully!!")
+            page.elements.modalUpdate.modal('hide');
+        }).fail((err) => {
+            console.log(err)
+            App.IziToast.showErrorAlert("ERROR_400");
+        });
     }
 
     page.dialogs.commands.loadImageToCanvas = (imageFile) => {
@@ -222,6 +318,13 @@
         }
     }
 
+    page.dialogs.elements.clearImagePreview = () => {
+        page.dialogs.elements.imageFile.val("");
+        page.dialogs.elements.imagePreview.css("display", "none");
+        page.dialogs.elements.wrapper.removeClass("active");
+        page.dialogs.elements.wrapperContent.css("opacity", 1);
+    }
+
     page.dialogs.elements.frmCreate.validate({
         rules: {
             nameCre: {
@@ -242,10 +345,39 @@
         }
     })
 
+    page.dialogs.elements.frmUpdate.validate({
+        rules: {
+            nameUp: {
+                required: true,
+                minlength: 5,
+                maxlength: 35
+            }
+        },
+        messages: {
+            nameUp: {
+                required: "Vui lòng nhập tên đầy đủ",
+                minlength: "Họ tên tối thiểu 5 ký tự",
+                maxlength: "Họ tên tối đa 35 ký tự"
+            }
+        },
+        submitHandler: function () {
+            page.commands.updateProduct();
+        }
+    })
+
     page.commands.initTooltip = () => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     }
+
+    page.elements.modalCreate.on("hidden.bs.modal", function () {
+        page.dialogs.elements.frmCreate[0].reset();
+        page.dialogs.elements.btnClearImagePreview.trigger("click");
+    });
+    page.elements.modalUpdate.on("hidden.bs.modal", function () {
+        page.dialogs.elements.frmUpdate[0].reset();
+        page.dialogs.elements.btnClearImagePreview.trigger("click");
+    });
 
     page.initializeEventControl = () => {
         page.dialogs.elements.divImagePreview.on("click", function () {
@@ -254,6 +386,9 @@
 
         page.dialogs.elements.imageFile.on("change", function () {
             page.dialogs.commands.changeImagePreview();
+        });
+        page.dialogs.elements.btnClearImagePreview.on("click", function () {
+            page.dialogs.elements.clearImagePreview();
         });
 
     }

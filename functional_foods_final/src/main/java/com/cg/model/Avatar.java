@@ -1,5 +1,6 @@
 package com.cg.model;
 
+import com.cg.model.dto.AvatarDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,11 @@ public class Avatar extends BaseEntity {
     @Column(columnDefinition = "BIGINT(20) DEFAULT 0")
     private Long ts = new Date().getTime();
 
+    public AvatarDTO toAvatarDTO(){
+        return new AvatarDTO()
+                .setFileFolder(fileFolder)
+                .setFileName(fileName);
+    }
 
 
 }

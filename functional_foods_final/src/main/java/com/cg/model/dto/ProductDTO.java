@@ -1,5 +1,6 @@
 package com.cg.model.dto;
 
+import com.cg.model.Avatar;
 import com.cg.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,14 +25,16 @@ public class ProductDTO {
     private BigDecimal price;
 
     private String description;
+    private AvatarDTO avatar;
 
 
-    public ProductDTO(Long id, String name, int amount, BigDecimal price, String description) {
+    public ProductDTO(Long id, String name, int amount, BigDecimal price, String description, Avatar avatar) {
         this.id = id;
         this.name = name;
         this.amount = amount;
         this.price = price;
         this.description = description;
+        this.avatar = avatar.toAvatarDTO();
     }
 
     public Product toProduct(){

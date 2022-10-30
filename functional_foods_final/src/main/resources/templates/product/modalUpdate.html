@@ -5,35 +5,35 @@
     <title>Title</title>
 </head>
 <body>
-<th:block th:fragment="modalCreate">
-    <div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<th:block th:fragment="modalUpdate">
+    <div class="modal fade" id="modalUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal create</h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal update</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="frmCreate" method="post">
+                    <form id="frmUpdate" method="post">
                         <div class="col-lg-8 fl">
                             <div class="row col-lg-12 mt-3">
                                 <div class="col-lg-6">
                                     <label>Name Product</label>
-                                    <input type="text" id="nameCre" name="nameCre" class="form-control">
+                                    <input type="text" id="nameUp" name="nameUp" class="form-control">
                                 </div>
                                 <div class="col-lg-6">
                                     <label>Amount</label>
-                                    <input type="number" id="amountCre" name="amountCre" class="form-control">
+                                    <input type="number" id="amountUp" name="amountUp" class="form-control">
                                 </div>
                             </div>
                             <div class="row col-lg-12 mt-3">
                                 <div class="col-lg-6">
                                     <label>Price</label>
-                                    <input type="number" id="priceCre" name="priceCre" class="form-control">
+                                    <input type="number" id="priceUp" name="priceUp" class="form-control">
                                 </div>
                                 <div class="col-lg-6">
                                     <label>Description</label>
-                                    <textarea type="text" id="descriptionCre" name="descriptionCre" class="form-control" rows="3"></textarea>
+                                    <textarea type="text" id="descriptionUp" name="descriptionUp" class="form-control" rows="3"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -70,9 +70,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" id="btnCreate" class="btn btn-primary">
-                        <i class="fas fa-plus"></i>
-                        Create
+                    <button type="button" id="btnUpdate" class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                        Edit
                     </button>
                 </div>
             </div>

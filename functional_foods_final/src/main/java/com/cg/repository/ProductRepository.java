@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "p.name, " +
             "p.amount, " +
             "p.price, " +
-            "p.description) FROM Product AS p")
+            "p.description, " +
+            "p.avatar) FROM Product AS p")
     List<ProductDTO> getAllProduct();
 }

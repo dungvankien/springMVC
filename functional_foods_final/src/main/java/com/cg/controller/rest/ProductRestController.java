@@ -1,5 +1,6 @@
 package com.cg.controller.rest;
 
+import com.cg.exception.DataInputException;
 import com.cg.model.Product;
 import com.cg.model.dto.ProductAvatarDTO;
 import com.cg.model.dto.ProductDTO;
@@ -45,6 +46,29 @@ public class ProductRestController {
         Product newProduct = productService.saveWithAvatar(product, productAvatarDTO.getFile());
         productAvatarDTO.setId(newProduct.getId());
         return new ResponseEntity<>(newProduct.toProductDTO(),HttpStatus.CREATED);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<ProductDTO> update(@ModelAttribute ProductAvatarDTO productAvatarDTO){
+        Product product = productAvatarDTO.toProduct();
+        Product newProduct = productService.saveWithAvatar(product, productAvatarDTO.getFile());
+        productAvatarDTO.setId(newProduct.getId());
+        return new ResponseEntity<>(newProduct.toProductDTO(),HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/delete/{productId}")
+    public ResponseEntity<ProductDTO> delete(@PathVariable Long productId){
+        Optional<Product> productOptional = productService.findById(productId);
+        if(!productOptional.isPresent()){
+            throw new DataInputException("Not exist!");
+        }
+        try {
+            productService.remove(productId);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DataInputException("Please contact admin!");
+        }
     }
 
 
