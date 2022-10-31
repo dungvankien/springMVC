@@ -17,11 +17,22 @@
                 <div class="col-sm-5">
                     <h1>List of products</h1>
                 </div>
-                <div class="col-sm-7">
+                <div class="col-sm-6">
                     <button id="btnShowCreateModal" class="btn btn-outline-light">
                         <i class="fas fa-plus"></i>
                         <span>Add New Product</span>
                     </button>
+                </div>
+                <div class="btn-group col-sm-1">
+                    <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 50%">
+                        <i class="far fa-address-card"></i>
+                        <th:block th:text="${username}"/>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/">Home</a></li>
+                        <li><a class="dropdown-item" href="/users">List of User</a></li>
+                        <li><a class="dropdown-item" href="/logout">Sign Out</a></li>
+                    </ul>
                 </div>
             </div>
         </header>
@@ -245,9 +256,7 @@
             page.commands.handleOpenConfirmDelete();
 
             App.IziToast.showSuccessAlert("successfully!!")
-            // page.elements.modalCreate.modal('hide');
-        }).fail((err) => {
-            console.log(err)
+        }).fail((jqXHR) => {
             App.IziToast.showErrorAlert("ERROR_400");
         });
     }
@@ -331,13 +340,30 @@
                 required: true,
                 minlength: 5,
                 maxlength: 35
+            },
+            amountCre: {
+                required: true,
+                min: 1,
+            },
+            priceCre: {
+                required: true,
+                min: 1,
             }
+
         },
         messages: {
             nameCre: {
                 required: "Vui lòng nhập tên đầy đủ",
                 minlength: "Họ tên tối thiểu 5 ký tự",
                 maxlength: "Họ tên tối đa 35 ký tự"
+            },
+            amountCre:{
+                required: "vui lòng nhập số lượng",
+                min: "phải nhập số nguyên lớn hơn 0"
+            },
+            priceCre: {
+                required: "vui lòng nhập giá",
+                min: "phải nhập số nguyên lớn hơn 0"
             }
         },
         submitHandler: function () {
@@ -351,6 +377,14 @@
                 required: true,
                 minlength: 5,
                 maxlength: 35
+            },
+            amountUp: {
+                required: true,
+                min: 1,
+            },
+            priceUp: {
+                required: true,
+                min: 1,
             }
         },
         messages: {
@@ -358,7 +392,16 @@
                 required: "Vui lòng nhập tên đầy đủ",
                 minlength: "Họ tên tối thiểu 5 ký tự",
                 maxlength: "Họ tên tối đa 35 ký tự"
+            },
+            amountUp: {
+                required: "vui lòng nhập số lượng",
+                min: "phải nhập số nguyên lớn hơn 0"
+            },
+            priceUp: {
+                required: "vui lòng nhập giá",
+                min: "phải nhập số nguyên lớn hơn 0"
             }
+
         },
         submitHandler: function () {
             page.commands.updateProduct();

@@ -8,6 +8,7 @@ class App {
     static BASE_CLOUDIARY_SERVER = "https://res.cloudinary.com/dbs0dzlvw";
     static BASE_CLOUDIARY_IMAGE_URL = this.BASE_CLOUDIARY_SERVER + "/image/upload";
     static BASE_SCALE_IMAGE = "c_limit,w_150,h_100,q_100";
+    static BASE_SCALE_IMAGE_INDEX = "c_limit,w_317,h_412,q_100";
 
     static AlertMessageEn = class {
 
@@ -88,11 +89,11 @@ class App {
     static renderRowUser(obj) {
         let str = `
             <tr id="tr_${obj.id}">
-                <td>${obj.id}</td>
-                <td>${obj.fullName}</td>
-                <td>${obj.username}</td>
+                <td class="text-center">${obj.id}</td>
+                <td class="text-center">${obj.fullName}</td>
+                <td class="text-center">${obj.username}</td>
                 <td class="text-center">${obj.phone}</td>
-                <td>${obj.address}</td>
+                <td class="text-center">${obj.address}</td>
                 <td class="text-end num-space">${obj.role.code}</td>
                 <td class="text-center">
                     <a class="btn btn-outline-secondary edit" data-id="${obj.id}" title="" data-bs-toggle="tooltip"  data-bs-original-title="Edit">
@@ -132,6 +133,30 @@ class App {
                     </a>
                 </td>
             </tr>
+        `;
+
+        return str;
+    }
+
+    static renderRowProductIndex(obj,avatar){
+        let str = `
+            <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
+                <div class="card product-card">
+                    <a class="card-img-top d-block overflow-hidden text-center" href="#">
+                    <img width="auto" height="250px" " alt="Product" src="${this.BASE_CLOUDIARY_IMAGE_URL}/${this.BASE_SCALE_IMAGE_INDEX}/${avatar.fileFolder}/${avatar.fileName}">
+                    </a>
+                    <div class="card-body py-2">
+                        <h4 class="product-title fs-sm">${obj.name}</h4>
+                        <div class="d-flex justify-content-between">
+                            <div class="product-price"><h6>Price: ${obj.price} vnd<h6></div>
+                        </div>
+                    </div>
+                    <div class="card-body text-center"  style="display: flex">
+                        <button  style="margin: 5px 20px " class="btn btn-info btn-sm d-block w-40 mb-2 infoProduct " type="button" data-id="${obj.id}"><i class="fas fa-file-alt"></i> Info Product</button>
+                        <button style="margin: 5px 20px" class="btn btn-warning btn-sm d-block w-40 mb-2 " type="button" data-id="${obj.id}"><i class="fas fa-cart-arrow-down"></i> Add Cart</button>
+                    </div>
+                </div>
+            </div>
         `;
 
         return str;

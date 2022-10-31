@@ -9,6 +9,9 @@ import com.cg.util.AppUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,15 +42,17 @@ public class ProductRestController {
         Product product = productOptional.get();
         return new ResponseEntity<>(product.toProductDTO(), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/create")
-    public ResponseEntity<ProductDTO> create(@ModelAttribute ProductAvatarDTO productAvatarDTO){
+    public ResponseEntity<?> create(@ModelAttribute ProductAvatarDTO productAvatarDTO){
         productAvatarDTO.setId(0L);
         Product product = productAvatarDTO.toProduct();
         Product newProduct = productService.saveWithAvatar(product, productAvatarDTO.getFile());
         productAvatarDTO.setId(newProduct.getId());
         return new ResponseEntity<>(newProduct.toProductDTO(),HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/update")
     public ResponseEntity<ProductDTO> update(@ModelAttribute ProductAvatarDTO productAvatarDTO){
         Product product = productAvatarDTO.toProduct();
@@ -55,7 +60,7 @@ public class ProductRestController {
         productAvatarDTO.setId(newProduct.getId());
         return new ResponseEntity<>(newProduct.toProductDTO(),HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<ProductDTO> delete(@PathVariable Long productId){
         Optional<Product> productOptional = productService.findById(productId);

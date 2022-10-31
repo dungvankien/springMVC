@@ -9,10 +9,11 @@ import com.cg.util.AppUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
+@PreAuthorize("hasAnyAuthority('ADMIN')")
 @RestController
 @RequestMapping("api/users")
 public class UserRestController {
@@ -36,7 +37,6 @@ public class UserRestController {
         User user = userOptional.get();
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
-
     @PostMapping("/update")
     public ResponseEntity<UserUpdateDTO> update(@RequestBody UserUpdateDTO userUpdateDTO){
         Optional<User> userOptional = userService.findById(userUpdateDTO.getId());
@@ -48,7 +48,6 @@ public class UserRestController {
         User newUser = userService.saveUserNotPassword(user);
         return new ResponseEntity<>(newUser.toUserUpdateDTO(),HttpStatus.ACCEPTED);
     }
-
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<UserDTO> delete(@PathVariable Long userId) {
         Optional<User> userOptional = userService.findById(userId);

@@ -10,8 +10,19 @@
 <div class="main-container">
     <header>
         <div class="row">
-            <div class="col-sm-5">
+            <div class="col-sm-11">
                 <h1>List Of User</h1>
+            </div>
+            <div class="btn-group col-sm-1">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 50%">
+                    <i class="far fa-address-card"></i>
+                    <th:block th:text="${username}"/>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/">Home</a></li>
+                    <li><a class="dropdown-item" href="/products">List of Product</a></li>
+                    <li><a class="dropdown-item" href="/logout">Sign Out</a></li>
+                </ul>
             </div>
         </div>
     </header>

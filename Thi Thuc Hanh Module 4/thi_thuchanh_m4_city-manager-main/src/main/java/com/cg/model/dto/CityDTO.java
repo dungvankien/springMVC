@@ -32,7 +32,7 @@ public class CityDTO {
     private String population;
 
     @NotBlank(message = "Vui lòng nhập thông tin GDP!")
-    @Pattern(regexp = "^[0-9]+$", message = "GDP phải là số nguyên dương")
+    @Pattern(regexp = "^[0-9]+$")
     private String gdp;
 
     @NotBlank(message = "Vui lòng nhập thông tin giới thiệu!")
