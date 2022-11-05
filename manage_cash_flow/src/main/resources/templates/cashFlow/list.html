@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v5.2.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/izitoast/v1.4.0/iziToast-1.4.0.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <div class="container-xxl" >
+        <input type="hidden" id="currentRow">
+        <h3>Sổ thu chi (không tính doanh thu bán hàng</h3>
+        <br>
+        <div class="row">
+            <div class="col-1">
+                <br>
+                <button type="button" class="btn btn-success">Thu</button>
+                <button type="button" class="btn btn-danger">Chi</button>
+                <button type="button" class="btn btn-warning">Nợ</button>
+                <button type="button" class="btn btn-light">Tất cả</button>
+            </div>
+            <div class="col-8">
+                <div class=" row col-12">
+                    <div class="col-4">Tất cả giao dịch </div>
+                    <div class="btn col-4">
+                        <span>Từ: <input type="date" id="dateFrom" name="dateFrom" ></span>
+                    </div>
+                    <div class="btn col-4">
+                        <span>Đến: <input type="date" id="dateTo" name="dateTo"></span>
+                    </div>
+                </div>
+                <div class="bg-light body">
+                    <table id= "tbCashFlow" class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Thời điểm</th>
+                            <th scope="col">Thể loại</th>
+                            <th scope="col">Diễn giải</th>
+                            <th scope="col">Số tiền</th>
+                            <th scope="col">Người ghi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class=" row col-12">
+                    <div class="col-3">Thu: </div>
+                    <div class="col-3">Chi: </div>
+                    <div class="col-4 text-center">Tổng gia dịch: </div>
+                    <div class="col-2 text-center">
+                        <button type="button" class= "btn btn-info">Excel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row col-12 ">
+                    <div class="col-4"><button id = "btnShowCreate" type="button" class="btn btn-outline-primary">Thêm</button></div>
+                    <div class="col-4"><button id = "btnShowUpdate" type="button" class="btn btn-outline-secondary">Sửa</button></div>
+                    <div class="col-4"><button id = "btnShowDelete" type="button" class="btn btn-outline-danger">Xóa</button></div>
+                </div>
+                <th:block th:replace="/cashFlow/formCreate :: formCreate" />
+                <th:block th:replace="/cashFlow/formEdit :: formEdit" />
+                <th:block th:replace="/cashFlow/formSuspend :: formSuspend" />
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/bootstrap/v5.2.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/izitoast/v1.4.0/iziToast-1.4.0.js"></script>
+    <script src="/assets/jquery/jquery-v3.6.0.min.js"></script>
+    <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+    <script src="/assets/js/app.js"></script>
+
+    <script>
+
+        let page = {
+            urls: {
+                getAllCashFlow: App.BASE_URL_CASH_FLOW,
+                getCashFlowById: App.BASE_URL_CASH_FLOW,
+                getAllMethod: App.BASE_URL_CASH_FLOW,
+                getAllCategory: App.BASE_URL_CASH_FLOW,
+                create: App.BASE_URL_CASH_FLOW + "/create",
+                update: App.BASE_URL_CASH_FLOW + "/update",
+                suspend: App.BASE_URL_CASH_FLOW + "/suspend/"
+            },
+            elements: {},
+            loadData: {},
+            commands: {},
+            dialogs: {
+                elements: {},
+                loadData: {},
+                commands: {},
+            },
+            initializeEventControl: {}
+        }
+
+        let cashFlow = new CashFlow();
+        let category = new Category();
+        let user = new User();
+        let method = new Method();
+
+        page.elements.tbCashFlow = $("#tbCashFlow tbody");
+        page.elements.btnShowCreate = $("#btnShowCreate");
+        page.elements.btnShowUpdate = $("#btnShowUpdate");
+        page.elements.btnShowDelete = $("#btnShowDelete");
+
+        page.elements.showCreate = $("#showCreate");
+        page.elements.showEdit = $("#showEdit");
+        page.elements.showSuspend = $("#showSuspend");
+
+        page.elements.currentRow = $("#currentRow");
+
+
+        page.dialogs.elements.frmCreate = $("#frmCreate");
+        page.dialogs.elements.btnCreate = $("#btnCreate");
+        page.dialogs.elements.btnExitCreate = $("#btnExitCreate");
+        page.dialogs.elements.methodCreate = $("#methodCreate");
+        page.dialogs.elements.categoryCreate = $("#categoryCreate");
+        page.dialogs.elements.descriptionCreate = $("#descriptionCreate");
+        page.dialogs.elements.moneyCreate = $("#moneyCreate");
+        page.dialogs.elements.dateCreate = $("#dateCreate");
+
+        page.dialogs.elements.frmEdit = $("#frmEdit");
+        page.dialogs.elements.btnEdit = $("#btnEdit");
+        page.dialogs.elements.btnExitEdit = $("#btnExitEdit");
+        page.dialogs.elements.methodEdit = $("#methodEdit");
+        page.dialogs.elements.categoryEdit = $("#categoryEdit");
+        page.dialogs.elements.descriptionEdit = $("#descriptionEdit");
+        page.dialogs.elements.moneyEdit = $("#moneyEdit");
+        page.dialogs.elements.dateEdit = $("#dateEdit");
+
+        page.dialogs.elements.frmSuspend = $("#frmSuspend");
+        page.dialogs.elements.btnSuspend = $("#btnSuspend");
+        page.dialogs.elements.btnExitSuspend = $("#btnExitSuspend");
+        page.dialogs.elements.methodSuspend = $("#methodSuspend");
+        page.dialogs.elements.categorySuspend = $("#categorySuspend");
+        page.dialogs.elements.descriptionSuspend = $("#descriptionSuspend");
+        page.dialogs.elements.moneySuspend = $("#moneySuspend");
+        page.dialogs.elements.dateSuspend = $("#dateSuspend");
+
+        page.commands.getAllCashFlows = () => {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getAllCashFlow
+            })
+            .done((data) => {
+                data.map(item => {
+                    if(item.method.id == 1){
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'blue'))
+                    } else if(item.method.id == 2){
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'red'))
+                    } else {
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'yellow'))
+                    }
+                });
+                page.commands.handleSelectTr();
+
+            })
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+            })
+        }
+
+        page.commands.getAllMethod = () =>{
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getAllMethod + "/methods"
+            })
+                .done((data) => {
+                    data.map(item => {
+                        let str = `<option value="${item.id}">${item.nameMethod}</option>`;
+                        page.dialogs.elements.methodCreate.append(str);
+                        page.dialogs.elements.methodEdit.append(str);
+                        page.dialogs.elements.methodSuspend.append(str);
+                    })
+                })
+                .fail((jqXHR) => {
+                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+                })
+        }
+
+        page.commands.getAllCategory = () =>{
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getAllMethod + "/categorys"
+            })
+                .done((data) => {
+                    data.map(item => {
+                        let str = `<option value="${item.id}">${item.nameCategory}</option>`;
+                        page.dialogs.elements.categoryCreate.append(str);
+                        page.dialogs.elements.categoryEdit.append(str);
+                        page.dialogs.elements.categorySuspend.append(str);
+                    })
+                })
+                .fail((jqXHR) => {
+                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+                })
+        }
+
+        page.commands.getCashFlowById = (cashFlowId) => {
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getCashFlowById + "/" + cashFlowId
+            })
+            .done((data) => {
+                cashFlow = data;
+            })
+            .fail((jqXHR) => {
+                console.log("jqXHR ======");
+                console.log(jqXHR);
+            });
+        }
+
+        page.elements.btnShowCreate.on("click", () => {
+            page.elements.showCreate.show();
+            page.elements.showEdit.hide();
+            page.elements.showSuspend.hide();
+        })
+
+        page.dialogs.elements.btnCreate.on("click", () => {
+            page.dialogs.elements.frmCreate.trigger("submit");
+        })
+
+        page.dialogs.elements.btnEdit.on("click", () => {
+            page.dialogs.elements.frmEdit.trigger("submit");
+        })
+
+        page.dialogs.elements.btnSuspend.on("click", () => {
+            let cashFlowId = page.elements.currentRow.val();
+            page.commands.suspendCashFlow(cashFlowId);
+            page.elements.showSuspend.hide();
+        })
+
+        page.dialogs.elements.btnExitCreate.on("click", () => {
+            page.dialogs.elements.frmCreate[0].reset();
+            page.dialogs.elements.frmCreate.validate().resetForm();
+            page.elements.showCreate.hide();
+        })
+
+        page.dialogs.elements.btnExitEdit.on("click", () => {
+            page.dialogs.elements.frmEdit[0].reset();
+            page.dialogs.elements.frmEdit.validate().resetForm();
+            page.elements.showEdit.hide();
+        })
+
+        page.dialogs.elements.btnExitSuspend.on("click", () => {
+            page.dialogs.elements.frmSuspend[0].reset();
+            page.elements.showSuspend.hide();
+        })
+
+        page.commands.createCashFlow = () => {
+            user.id = 1;
+
+            category.id = page.dialogs.elements.categoryCreate.val();
+            category.nameCategory = page.dialogs.elements.categoryCreate.find("option:selected").text();
+
+            method.id = page.dialogs.elements.methodCreate.val();
+            method.nameMethod = page.dialogs.elements.methodCreate.find("option:selected").text();
+
+            cashFlow.id = 0;
+            cashFlow.method = method;
+            cashFlow.time = page.dialogs.elements.dateCreate.val();
+            cashFlow.category= category;
+            cashFlow.amountMoney = page.dialogs.elements.moneyCreate.val();
+            cashFlow.description = page.dialogs.elements.descriptionCreate.val();
+            cashFlow.user= user;
+            console.log(cashFlow);
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: page.urls.create,
+                data: JSON.stringify(cashFlow)
+            })
+            .done((data) => {
+                cashFlow = data;
+                if(cashFlow.method.id == 1){
+                    page.elements.tbCashFlow.prepend(App.renderRowCashFlow(cashFlow, 'blue'));
+                } else if(cashFlow.method.id == 2){
+                    page.elements.tbCashFlow.prepend(App.renderRowCashFlow(cashFlow, 'red'));
+                } else {
+                    page.elements.tbCashFlow.prepend(App.renderRowCashFlow(cashFlow, 'yellow'));
+                }
+                page.commands.handleSelectTr();
+                App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_CREATED);
+            })
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
+            })
+        }
+
+        page.elements.handleShowEdit = () => {
+            page.elements.btnShowUpdate.on("click", () => {
+                let cashFlowId = page.elements.currentRow.val();
+                page.commands.getCashFlowById(cashFlowId).then(() => {
+                    page.dialogs.elements.dateEdit.val(cashFlow.time);
+                    page.dialogs.elements.descriptionEdit.val(cashFlow.description);
+                    page.dialogs.elements.moneyEdit.val(cashFlow.amountMoney);
+                    page.dialogs.elements.categoryEdit.val(cashFlow.category.id);
+                    page.dialogs.elements.methodEdit.val(cashFlow.method.id);
+                    page.elements.showEdit.show();
+                    page.elements.showCreate.hide();
+                    page.elements.showSuspend.hide();
+                })
+                    .catch(() => {
+                        console.log("get edit fail");
+                        App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_404);
+                    })
+            })
+        }
+
+        page.elements.handleShowSuspend = () => {
+            page.elements.btnShowDelete.on("click", () => {
+                let cashFlowId = page.elements.currentRow.val();
+                page.commands.getCashFlowById(cashFlowId).then(() => {
+                    page.dialogs.elements.dateSuspend.val(cashFlow.time);
+                    page.dialogs.elements.descriptionSuspend.val(cashFlow.description);
+                    page.dialogs.elements.moneySuspend.val(cashFlow.amountMoney);
+                    page.dialogs.elements.categorySuspend.val(cashFlow.category.id);
+                    page.dialogs.elements.methodSuspend.val(cashFlow.method.id);
+                    page.elements.showSuspend.show();
+                    page.elements.showEdit.hide();
+                    page.elements.showCreate.hide();
+                })
+                    .catch(() => {
+                        console.log("get edit fail");
+                        App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_404);
+                    })
+            })
+        }
+
+        page.commands.handleSelectTr = () =>{
+            $("#tbCashFlow tbody tr").on("click", function() {
+                let cashFlowId = $(this).attr("id").replace("tr_","");
+                page.elements.currentRow.val(cashFlowId);
+
+                $("#tbCashFlow tbody tr td .select-tab").removeClass("selected").addClass("unselected");
+                $(this).find("td .select-tab").removeClass("unselected").addClass("selected");
+
+                page.elements.handleShowEdit();
+                page.elements.handleShowSuspend();
+            })
+        }
+
+        page.commands.editCashFlow = () => {
+            user.id = 1;
+
+            category.id = page.dialogs.elements.categoryEdit.val();
+            category.nameCategory = page.dialogs.elements.categoryEdit.find("option:selected").text();
+
+            method.id = page.dialogs.elements.methodEdit.val();
+            method.nameMethod = page.dialogs.elements.methodEdit.find("option:selected").text();
+
+            cashFlow.id = page.elements.currentRow.val();
+            cashFlow.method = method;
+            cashFlow.time = page.dialogs.elements.dateEdit.val();
+            cashFlow.category= category;
+            cashFlow.amountMoney = page.dialogs.elements.moneyEdit.val();
+            cashFlow.description = page.dialogs.elements.descriptionEdit.val();
+            cashFlow.user= user;
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: page.urls.update,
+                data: JSON.stringify(cashFlow)
+            })
+                .done((data) => {
+                    let currentRow = $("#tr_" + data.id);
+                    cashFlow = data;
+                    if(cashFlow.method.id == 1){
+                        currentRow.replaceWith(App.renderRowCashFlow(cashFlow, 'blue'));
+                    } else if(cashFlow.method.id == 2){
+                        currentRow.replaceWith(App.renderRowCashFlow(cashFlow, 'red'));
+                    } else {
+                        currentRow.replaceWith(App.renderRowCashFlow(cashFlow, 'yellow'));
+                    }
+                    App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_UPDATED);
+                    page.elements.showEdit.hide();
+                    page.commands.handleSelectTr();
+                })
+                .fail((jqXHR) => {
+                    App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
+                })
+        }
+
+        page.commands.suspendCashFlow = (cashFlowId) => {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "DELETE",
+                url: page.urls.suspend + cashFlowId
+            })
+                .done(() => {
+                     $("#tr_" + cashFlowId).remove();
+                    App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_DEACTIVATE);
+                    page.elements.showSuspend.hide();
+                })
+                .fail((jqXHR) => {
+                    App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
+                })
+        }
+
+        page.dialogs.elements.frmCreate.validate({
+            rules: {
+                descriptionCreate: {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 35
+                }
+            },
+            messages: {
+                descriptionCreate: {
+                    required: "Vui lòng nhập tên đầy đủ",
+                    minlength: "Họ tên tối thiểu 5 ký tự",
+                    maxlength: "Họ tên tối đa 35 ký tự"
+                }
+            },
+            submitHandler: function () {
+                page.commands.createCashFlow();
+            }
+        })
+
+        page.dialogs.elements.frmEdit.validate({
+            rules: {
+                descriptionEdit: {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 35
+                }
+            },
+            messages: {
+                descriptionEdit: {
+                    required: "Vui lòng nhập tên đầy đủ",
+                    minlength: "Họ tên tối thiểu 5 ký tự",
+                    maxlength: "Họ tên tối đa 35 ký tự"
+                }
+            },
+            submitHandler: function () {
+                page.commands.editCashFlow();
+            }
+        })
+
+        page.loadData = () => {
+            page.commands.getAllCashFlows();
+            page.commands.getAllMethod();
+            page.commands.getAllCategory();
+        }
+
+        $(() => {
+            page.loadData();
+        })
+        page.elements.showEdit.hide();
+        page.elements.showCreate.hide();
+        page.elements.showSuspend.hide();
+    </script>
+</body>
+</html>

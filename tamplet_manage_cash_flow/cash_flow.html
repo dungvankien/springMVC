@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="bootstrap-5.2.0/css/bootstrap.min.css">
+    <style>
+        button {
+            margin: 10px;
+            width: 80px;
+        }
+        .container-xxl {
+            height: 100vh;
+            background-color: rgb(192, 186, 186);
+        }
+        .form_display{
+            display: flex;
+        }
+        input{
+            width: 200px;
+        }
+        .form-select {
+            width: 200px;
+        }
+        .body {
+            height: 450px;
+        }
+      
+    </style>
+</head>
+<body>
+    <div class="container-xxl" >
+        <h3>Sổ thu chi (không tính doanh thu bán hàng</h3>
+        <br>
+        <div class="row">
+          <div class="col-1">
+                <br>
+                <button type="button" class="btn btn-success">Thu</button>
+                <button type="button" class="btn btn-danger">Chi</button>
+                <button type="button" class="btn btn-warning">Nợ</button>
+                <button type="button" class="btn btn-light">Tất cả</button>
+          </div>
+          <div class="col-8">
+                <div class=" row col-12">
+                    <div class="col-4">Tất cả giao dịch </div>
+                    <div class="btn col-4">
+                        <span>Từ: <input type="date" id="dateFrom" name="dateFrom" ></span>
+                    </div>
+                    <div class="btn col-4">
+                        <span>Đến: <input type="date" id="dateTo" name="dateTo"></span> 
+                    </div>
+                </div>
+                <div class="bg-light body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                              <th scope="col">Thời điểm</th>
+                              <th scope="col">Thể loại</th>
+                              <th scope="col">Diễn giải</th>
+                              <th scope="col">Số tiền</th>
+                              <th scope="col">Người ghi</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th scope="row">1</th>
+                              <td>Mark</td>
+                              <td>Otto</td>
+                              <td>@mdo</td>
+                              <td>@mdo</td>
+                            </tr>
+                          </tbody>
+                    </table>
+                </div>
+                <div class=" row col-12">
+                    <div class="col-3">Thu: </div>
+                    <div class="col-3">Chi: </div>
+                    <div class="col-4 text-center">Tổng gia dịch: </div>
+                    <div class="col-2 text-center">
+                        <button type="button" class= "btn btn-info">Excel</button>
+                    </div>
+                </div>
+          </div>
+          <div class="col-3">
+                <div class="row col-12 ">
+                    <div class="col-4"><button type="button" class="btn btn-outline-primary">Thêm</button></div>
+                    <div class="col-4"><button type="button" class="btn btn-outline-secondary">Sửa</button></div>
+                    <div class="col-4"><button type="button" class="btn btn-outline-danger">Xóa</button></div>
+                </div>
+                <div class="bg-light">
+                    <h6 class="bg-info">Giao dich</h6>
+                    <form action="">
+                        <div class="row">
+                            
+                            <div class="col-4"> Loại:</div>
+                            <div class="col-8 text-center btn">
+                                <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+                                    <option value="1">Chi</option>
+                                    <option value="2">Thu</option>
+                                    <option value="3">Nợ</option>
+                                </select>
+                            </div>
+                           
+                            <div class="col-4"> Thể loại: </div>
+                            <div class="col-8 text-center btn">
+                                <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+                                    <option value="1">trả tiền mặt bằng</option>
+                                    <option value="2">Thu</option>
+                                    <option value="3">Nợ</option>
+                                </select>
+                            </div>
+
+                            <div class="col-4"> Diển giải: </div>
+                            <div class="col-8 text-center btn">
+                                <input type="text">
+                            </div>
+
+                            <div class="col-4"> Số tiền: </div>
+                            <div class="col-8 text-center btn">
+                                <input type="number">
+                            </div>
+
+                            <div class="col-4"> Thời điểm: </div>
+                            <div class="col-8 text-center btn">
+                                <input type="date" id="date" name="date">
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" class="btn btn-outline-primary">Đồng ý</button>
+                            <button type="button" class="btn btn-outline-danger">Bỏ qua</button>
+                        </div>
+                    </form>
+                </div>
+          </div>
+        </div>
+    </div>
+
+    <script src="bootstrap-5.2.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

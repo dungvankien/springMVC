@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+ <th:block th:fragment="formCreate">
+     <div class="bg-light" id="showCreate">
+         <form action="" id="frmCreate">
+             <h6 class="bg-info">Thêm giao dich</h6>
+             <div class="row">
+
+                 <div class="col-4"> Loại:</div>
+                 <div class="col-8 text-center btn">
+                     <select id="methodCreate" name="methodCreate" class="form-select form-select-sm" >
+                     </select>
+                 </div>
+
+                 <div class="col-4"> Thể loại: </div>
+                 <div class="col-8 text-center btn">
+                     <select id="categoryCreate" name="categoryCreate" class="form-select form-select-sm" >
+                     </select>
+                 </div>
+
+                 <div class="col-4"> Diển giải: </div>
+                 <div class="col-8 text-center btn">
+                     <input type="text" id="descriptionCreate" name="descriptionCreate">
+                 </div>
+
+                 <div class="col-4"> Số tiền: </div>
+                 <div class="col-8 text-center btn">
+                     <input type="number" id="moneyCreate" name="moneyCreate">
+                 </div>
+
+                 <div class="col-4"> Thời điểm: </div>
+                 <div class="col-8 text-center btn">
+                     <input type="date" id="dateCreate" name="dateCreate">
+                 </div>
+             </div>
+
+             <div class="text-center">
+                 <button id="btnCreate" type="button" class="btn btn-outline-primary">Đồng ý</button>
+                 <button id="btnExitCreate" type="button" class="btn btn-outline-danger">Bỏ qua</button>
+             </div>
+         </form>
+     </div>
+ </th:block>
+</body>
+</html>

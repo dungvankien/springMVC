@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block th:fragment="formSuspend">
+    <div class="bg-light" id="showSuspend">
+        <form action="" id="frmSuspend">
+            <h6 class="bg-info">Xóa giao dich</h6>
+            <div class="row">
+
+                <div class="col-4"> Loại:</div>
+                <div class="col-8 text-center btn">
+                    <select id="methodSuspend" name="methodSuspend" class="form-select form-select-sm" readonly >
+                    </select>
+                </div>
+
+                <div class="col-4"> Thể loại: </div>
+                <div class="col-8 text-center btn">
+                    <select id="categorySuspend" name="categorySuspend" class="form-select form-select-sm" readonly>
+                    </select>
+                </div>
+
+                <div class="col-4"> Diển giải: </div>
+                <div class="col-8 text-center btn">
+                    <input type="text" id="descriptionSuspend" name="descriptionSuspend" readonly>
+                </div>
+
+                <div class="col-4"> Số tiền: </div>
+                <div class="col-8 text-center btn">
+                    <input type="number" id="moneySuspend" name="moneySuspend" readonly>
+                </div>
+
+                <div class="col-4"> Thời điểm: </div>
+                <div class="col-8 text-center btn">
+                    <input type="date" id="dateSuspend" name="dateSuspend" readonly>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="btnSuspend" type="button" class="btn btn-outline-primary">Đồng ý</button>
+                <button id="btnExitSuspend" type="button" class="btn btn-outline-danger">Bỏ qua</button>
+            </div>
+        </form>
+    </div>
+</th:block>
+</body>
+</html>

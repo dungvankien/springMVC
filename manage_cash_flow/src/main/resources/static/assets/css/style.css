@@ -1,0 +1,54 @@
+    button {
+        margin: 10px;
+        width: 80px;
+    }
+    .container-xxl {
+        height: 100vh;
+        background-color: rgb(192, 186, 186);
+    }
+    .form_display{
+        display: flex;
+    }
+    input{
+        width: 180px;
+    }
+    .form-select {
+        width: 180px;
+    }
+    .body {
+        height: 500px;
+    }
+
+    .yellow {
+        color: #8a0cde;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: blue;
+    }
+
+    .choice {
+        background-color: greenyellow;
+    }
+
+    table td span.select-tab {
+        border-left-width: 7px;
+        border-left-style: solid;
+        min-width: 0;
+        display: block;
+        height: 24px;
+        margin: 0 0 0 -4px;
+        padding: 0;
+    }
+
+    table td span.unselected {
+        border-left-color: #dfdfdf;
+    }
+
+    table td span.selected {
+        border-left-color: #5cb85c;
+    }

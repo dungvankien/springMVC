@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="c0522-spb-ajax-banking-location-jwt:war">
+    <output-path>$PROJECT_DIR$/c0522-spb-ajax-banking-location-jwt-master/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>c0522-spb-ajax-banking-location-jwt</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="c0522-spb-ajax-banking-location-jwt-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="c0522-spb-ajax-banking-location-jwt:war exploded" />
+    </root>
+  </artifact>
+</component>
