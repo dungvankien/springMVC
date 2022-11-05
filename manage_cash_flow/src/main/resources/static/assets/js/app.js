@@ -103,10 +103,12 @@ class App {
             <td>
                 <span class="select-tab unselected"></span>
             </td>
-            <td>${obj.time}</td>
+            <td>${new Date(obj.time).toLocaleDateString('vi-VN').slice(0, 10)}</td>
             <td>${obj.category.nameCategory}</td>
             <td>${obj.description}</td>
-            <td>${obj.amountMoney}</td>
+            <td>
+                ${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(obj.amountMoney)}
+            </td>
             <td>${obj.user.fullName}</td>
          </tr>
         `;

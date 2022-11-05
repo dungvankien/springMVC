@@ -1,11 +1,14 @@
 package com.cg.model;
 
 import com.cg.model.dto.CashFlowDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -17,8 +20,8 @@ public class CashFlow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String time;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss Z", timezone = "Asia/Ho_Chi_Minh")
+    private Date time;
 
     @Column(precision = 12, scale = 0, nullable = false, updatable = false)
     private BigDecimal amountMoney;

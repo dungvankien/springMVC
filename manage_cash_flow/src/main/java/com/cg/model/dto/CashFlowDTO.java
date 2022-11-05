@@ -8,7 +8,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class CashFlowDTO {
 
     private Long id;
 
-    private String time;
+    private Date time;
 
     private MethodDTO method;
 
@@ -32,7 +31,7 @@ public class CashFlowDTO {
 
     private UserDTO user;
 
-    public CashFlowDTO (Long id, String time, Method method, Category category, String description, BigDecimal amountMoney, User user){
+    public CashFlowDTO (Long id, Date time, Method method, Category category, String description, BigDecimal amountMoney, User user){
         this.id = id;
         this.time = time;
         this.method = method.toMethodDTO();
@@ -42,9 +41,7 @@ public class CashFlowDTO {
         this.user = user.toUserDTO();
     }
 
-    @SneakyThrows
     public CashFlow toCashFlow(){
-
         return new CashFlow()
                 .setId(id)
                 .setTime(time)
