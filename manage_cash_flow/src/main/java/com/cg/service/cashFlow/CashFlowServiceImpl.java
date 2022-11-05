@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,5 +51,15 @@ public class CashFlowServiceImpl implements ICashFlowService {
     @Override
     public void softDelete(Long cashFlowId) {
          cashFlowRepository.softDelete(cashFlowId);
+    }
+
+    @Override
+    public List<CashFlowDTO> choiceMethod(Long methodId) {
+        return cashFlowRepository.choiceMethod(methodId);
+    }
+
+    @Override
+    public BigDecimal getSumChoiceMoney(Long methodId) {
+        return cashFlowRepository.getSumChoiceMoney(methodId);
     }
 }

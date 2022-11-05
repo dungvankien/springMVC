@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,47 @@ public class CashFlowRestController {
     public ResponseEntity<?>getAllCategorys(){
         List<CategoryDTO> categorys = categoryService.getAllCategorysDTO();
         return new ResponseEntity<>(categorys, HttpStatus.OK);
+    }
+
+    @GetMapping("/cashFlowThus")
+    public ResponseEntity<?> getAllCashFlowThus(){
+        List<CashFlowDTO> cashFlows = cashFlowService.choiceMethod(1L);
+        return new ResponseEntity<>(cashFlows, HttpStatus.OK);
+    }
+    @GetMapping("/cashFlowChis")
+    public ResponseEntity<?> getAllCashFlowChis(){
+        List<CashFlowDTO> cashFlows = cashFlowService.choiceMethod(2L);
+        return new ResponseEntity<>(cashFlows, HttpStatus.OK);
+    }
+
+    @GetMapping("/cashFlowNos")
+    public ResponseEntity<?> getAllCashFlowNos(){
+        List<CashFlowDTO> cashFlows = cashFlowService.choiceMethod(3L);
+        return new ResponseEntity<>(cashFlows, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMoneyThu")
+    public ResponseEntity<?> getMoneyThu(){
+        BigDecimal getMoneyThu = cashFlowService.getSumChoiceMoney(1L);
+        return new ResponseEntity<>(getMoneyThu, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMoneyChi")
+    public ResponseEntity<?> getMoneyChi(){
+        BigDecimal getMoneyChi = cashFlowService.getSumChoiceMoney(2L);
+        return new ResponseEntity<>(getMoneyChi, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMoneyNo")
+    public ResponseEntity<?> getMoneyNo(){
+        BigDecimal getMoneyNo = cashFlowService.getSumChoiceMoney(3L);
+        return new ResponseEntity<>(getMoneyNo, HttpStatus.OK);
+    }
+
+    @GetMapping("/getMoneyAll")
+    public ResponseEntity<?> getMoneyAll(){
+        BigDecimal getMoneyAll = (cashFlowService.getSumChoiceMoney(1L)).subtract((cashFlowService.getSumChoiceMoney(2L)));
+        return new ResponseEntity<>(getMoneyAll, HttpStatus.OK);
     }
 
     @PostMapping("/create")
