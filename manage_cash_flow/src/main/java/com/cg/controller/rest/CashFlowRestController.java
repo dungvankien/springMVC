@@ -10,6 +10,7 @@ import com.cg.service.cashFlow.ICashFlowService;
 import com.cg.service.category.ICategoryService;
 import com.cg.service.method.IMethodService;
 import com.cg.util.AppUtil;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,9 @@ public class CashFlowRestController {
     @GetMapping
     public ResponseEntity<?> findAllByDeletedIsFalse(){
         List<CashFlowDTO> cashFlows = cashFlowService.findAllByDeletedIsFalse();
+        if(cashFlows.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(cashFlows, HttpStatus.OK);
     }
 
@@ -52,6 +57,20 @@ public class CashFlowRestController {
         }
         CashFlow cashFlow = cashFlowOptional.get();
         return new ResponseEntity<>(cashFlow.toCashFlowDTO(), HttpStatus.OK);
+    }
+
+    @SneakyThrows
+    @GetMapping("/{dateStart}/{dateEnd}")
+    public ResponseEntity<?>getAllCashFlowBetweenDate(@PathVariable String dateStart, @PathVariable String dateEnd){
+        Date dateStartNew = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStart);
+        Date dateEndNew = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateEnd);
+
+       List<CashFlowDTO> cashFlows = cashFlowService.getAllCashFlowBetweenDate(dateStartNew,dateEndNew);
+
+       if(cashFlows.isEmpty()){
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
+        return new ResponseEntity<>(cashFlows, HttpStatus.OK);
     }
 
     @GetMapping("/methods")
@@ -103,8 +122,35 @@ public class CashFlowRestController {
 
     @GetMapping("/getMoneyAll")
     public ResponseEntity<?> getMoneyAll(){
-        BigDecimal getMoneyAll = (cashFlowService.getSumChoiceMoney(1L)).subtract((cashFlowService.getSumChoiceMoney(2L)));
+        BigDecimal getMoneyThu = cashFlowService.getSumChoiceMoney(1L);
+        BigDecimal getMoneyChi = cashFlowService.getSumChoiceMoney(2L);
+        if(getMoneyChi == null){
+            return new ResponseEntity<>(getMoneyThu, HttpStatus.OK);
+        }
+        if(getMoneyThu == null) {
+            BigDecimal totalMoneyChi = getMoneyChi.add(getMoneyChi);
+            return new ResponseEntity<>(getMoneyChi.subtract(totalMoneyChi), HttpStatus.OK);
+        }
+        BigDecimal getMoneyAll = getMoneyThu.subtract(getMoneyChi);
         return new ResponseEntity<>(getMoneyAll, HttpStatus.OK);
+    }
+
+    @GetMapping("/date_timepicker_start")
+    public ResponseEntity<?>getDateStart(){
+        Date dateStart = cashFlowService.getDateStart();
+        if(dateStart == null) {
+            return new ResponseEntity<>(new Date(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(dateStart, HttpStatus.OK);
+    }
+
+    @GetMapping("/date_timepicker_end")
+    public ResponseEntity<?>getDateEnd(){
+        Date dateEnd = cashFlowService.getDateEnd();
+        if(dateEnd == null) {
+            return new ResponseEntity<>(new Date(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(dateEnd, HttpStatus.OK);
     }
 
     @PostMapping("/create")
@@ -132,7 +178,6 @@ public class CashFlowRestController {
         } catch ( Exception e) {
             throw new DataInputException("Vui lòng liên hệ Admin");
         }
-
     }
 
     @PostMapping("/update")

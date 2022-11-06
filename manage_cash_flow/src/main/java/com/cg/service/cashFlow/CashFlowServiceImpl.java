@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +62,20 @@ public class CashFlowServiceImpl implements ICashFlowService {
     @Override
     public BigDecimal getSumChoiceMoney(Long methodId) {
         return cashFlowRepository.getSumChoiceMoney(methodId);
+    }
+
+    @Override
+    public Date getDateStart() {
+        return cashFlowRepository.getDateStart();
+    }
+
+    @Override
+    public Date getDateEnd() {
+        return cashFlowRepository.getDateEnd();
+    }
+
+    @Override
+    public List<CashFlowDTO> getAllCashFlowBetweenDate(Date dateStart, Date dateEnd) {
+        return cashFlowRepository.getAllCashFlowBetweenDate(dateStart, dateEnd);
     }
 }

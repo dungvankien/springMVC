@@ -72,16 +72,16 @@
             <div class="col-1"></div>
             <div class="col-8">
                 <div class=" row col-12" style="color:red;">
-                    <div id="moneyMethodThuDiv" class="col">Thu:
+                    <div id="moneyMethodThuDiv" class="col-3">Thu:
                         <span id="moneyMethodThu"></span>
                     </div>
-                    <div id="moneyMethodChiDiv" class="col">Chi:
+                    <div id="moneyMethodChiDiv" class="col-3">Chi:
                         <span id="moneyMethodChi"></span>
                     </div>
-                    <div id="moneyMethodNoDiv" class="col">Nợ:
+                    <div id="moneyMethodNoDiv" class="col-2">Nợ:
                         <span id="moneyMethodNo"></span>
                     </div>
-                    <div id="moneyMethodAllDiv" class="col text-center">Tổng thu chi:
+                    <div id="moneyMethodAllDiv" class="col-4">Tổng thu chi:
                         <span id="moneyMethodAll"></span>
                     </div>
                 </div>
@@ -104,6 +104,7 @@
                 getCashFlowById: App.BASE_URL_CASH_FLOW,
                 getAllMethod: App.BASE_URL_CASH_FLOW,
                 getAllCategory: App.BASE_URL_CASH_FLOW,
+                getDateCashFlow: App.BASE_URL_CASH_FLOW,
                 getMoneyMethod: App.BASE_URL_CASH_FLOW,
                 create: App.BASE_URL_CASH_FLOW + "/create",
                 update: App.BASE_URL_CASH_FLOW + "/update",
@@ -135,6 +136,8 @@
         page.elements.btnNo = $("#btnNo");
         page.elements.btnAll = $("#btnAll");
 
+        page.elements.date_timepicker_start = $("#date_timepicker_start");
+        page.elements.date_timepicker_end = $("#date_timepicker_end");
 
         page.elements.showCreate = $("#showCreate");
         page.elements.showEdit = $("#showEdit");
@@ -209,11 +212,47 @@
                 page.dialogs.elements.moneyMethodChiDiv.show();
                 page.dialogs.elements.moneyMethodThuDiv.show();
                 page.dialogs.elements.moneyMethodNoDiv.show();
+                page.commands.getDateMinCashFlow();
+                page.commands.getDateMaxCashFlow();
 
             })
             .fail((jqXHR) => {
                 App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
             })
+        }
+
+        page.commands.getDateMinCashFlow = () => {
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getDateCashFlow + "/date_timepicker_start"
+            })
+            .done((data) => {
+                page.elements.date_timepicker_start.val(data.slice(0, 10));
+            })
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+            })
+        }
+
+        page.commands.getDateMaxCashFlow = () => {
+            return $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getDateCashFlow + "/date_timepicker_end"
+            })
+                .done((data) => {
+                    page.elements.date_timepicker_end.val(data.slice(0, 10));
+                })
+                .fail((jqXHR) => {
+                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+                })
         }
 
         page.commands.getAllMethod = () =>{
@@ -225,17 +264,17 @@
                 type: "GET",
                 url: page.urls.getAllMethod + "/methods"
             })
-                .done((data) => {
-                    data.map(item => {
-                        let str = `<option value="${item.id}">${item.nameMethod}</option>`;
-                        page.dialogs.elements.methodCreate.append(str);
-                        page.dialogs.elements.methodEdit.append(str);
-                        page.dialogs.elements.methodSuspend.append(str);
-                    })
+            .done((data) => {
+                data.map(item => {
+                    let str = `<option value="${item.id}">${item.nameMethod}</option>`;
+                    page.dialogs.elements.methodCreate.append(str);
+                    page.dialogs.elements.methodEdit.append(str);
+                    page.dialogs.elements.methodSuspend.append(str);
                 })
-                .fail((jqXHR) => {
-                    App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
-                })
+            })
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
+            })
         }
 
         page.commands.getAllCashFlowThu = () => {
@@ -260,6 +299,8 @@
                     page.dialogs.elements.moneyMethodChiDiv.hide();
                     page.dialogs.elements.moneyMethodThuDiv.show();
                     page.dialogs.elements.moneyMethodNoDiv.hide();
+                    page.commands.getDateMinCashFlow();
+                    page.commands.getDateMaxCashFlow();
                 })
                 .fail((jqXHR) => {
                     App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
@@ -289,6 +330,8 @@
                         page.dialogs.elements.moneyMethodChiDiv.show();
                         page.dialogs.elements.moneyMethodThuDiv.hide();
                         page.dialogs.elements.moneyMethodNoDiv.hide();
+                        page.commands.getDateMinCashFlow();
+                        page.commands.getDateMaxCashFlow();
                     })
                     .fail((jqXHR) => {
                         App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
@@ -318,6 +361,8 @@
                         page.dialogs.elements.moneyMethodChiDiv.hide();
                         page.dialogs.elements.moneyMethodThuDiv.hide();
                         page.dialogs.elements.moneyMethodNoDiv.show();
+                        page.commands.getDateMinCashFlow();
+                        page.commands.getDateMaxCashFlow();
                     })
                     .fail((jqXHR) => {
                         App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500)
@@ -365,9 +410,55 @@
                 });
         }
 
+        page.commands.getAllCashFlowDateStartToEnd = () => {
+            let dateStart = page.elements.date_timepicker_start.val() + " 00:00:00";
+            let dateEnd = page.elements.date_timepicker_end.val() + " 23:59:59";
+            page.elements.tbCashFlow.empty();
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: page.urls.getDateCashFlow + "/" + dateStart + "/" + dateEnd
+            })
+            .done((data) => {
+                data.map(item => {
+                    if (item.method.id == 1) {
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'blue'))
+                    } else if (item.method.id == 2) {
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'red'))
+                    } else {
+                        page.elements.tbCashFlow.prepend(App.renderRowCashFlow(item, 'yellow'))
+                    }
+                });
+                page.commands.getMoneyThu();
+                page.commands.getMoneyChi();
+                page.commands.getMoneyAll();
+                page.commands.getMoneyNo();
+                page.commands.handleSelectTr();
+                page.dialogs.elements.moneyMethodAllDiv.show();
+                page.dialogs.elements.moneyMethodChiDiv.show();
+                page.dialogs.elements.moneyMethodThuDiv.show();
+                page.dialogs.elements.moneyMethodNoDiv.show();
+            })
+            .fail((jqXHR) => {
+                console.log("jqXHR ======");
+                console.log(jqXHR);
+            });
+        }
+
         page.elements.btnAll.on("click", () =>{
             page.elements.tbCashFlow.empty();
             page.commands.getAllCashFlows();
+        })
+
+        page.elements.date_timepicker_start.on("blur", () => {
+            page.commands.getAllCashFlowDateStartToEnd();
+        })
+
+        page.elements.date_timepicker_end.on("blur", () => {
+            page.commands.getAllCashFlowDateStartToEnd();
         })
 
         page.commands.getMoneyThu = () =>{
@@ -523,6 +614,8 @@
                 page.commands.getMoneyChi();
                 page.commands.getMoneyAll();
                 page.commands.getMoneyNo();
+                page.commands.getDateMinCashFlow();
+                page.commands.getDateMaxCashFlow();
             })
             .fail((jqXHR) => {
 
@@ -638,6 +731,8 @@
                     page.commands.getMoneyChi();
                     page.commands.getMoneyAll();
                     page.commands.getMoneyNo();
+                    page.commands.getDateMinCashFlow();
+                    page.commands.getDateMaxCashFlow();
                 })
                 .fail((jqXHR) => {
                     $(".errorChoice").empty();
@@ -673,6 +768,8 @@
                     page.commands.getMoneyChi();
                     page.commands.getMoneyAll();
                     page.commands.getMoneyNo();
+                    page.commands.getDateMinCashFlow();
+                    page.commands.getDateMaxCashFlow();
 
                 })
                 .fail((jqXHR) => {
@@ -770,6 +867,8 @@
             page.commands.getAllCashFlowThu();
             page.commands.getAllCashFlowChi();
             page.commands.getAllCashFlowNo();
+            page.commands.getDateMinCashFlow();
+            page.commands.getDateMaxCashFlow();
         }
 
         $(() => {
@@ -783,7 +882,7 @@
     <script>
         jQuery(function () {
             jQuery('#date_timepicker_start').datetimepicker({
-                format: 'Y/m/d',
+                format: 'Y-m-d',
                 onShow: function (ct) {
                     this.setOptions({
                         maxDate: jQuery('#date_timepicker_end').val() ? jQuery('#date_timepicker_end').val() : false
@@ -792,7 +891,7 @@
                 timepicker: false
             });
             jQuery('#date_timepicker_end').datetimepicker({
-                format: 'Y/m/d',
+                format: 'Y-m-d',
                 onShow: function (ct) {
                     this.setOptions({
                         minDate: jQuery('#date_timepicker_start').val() ? jQuery('#date_timepicker_start').val() : false
