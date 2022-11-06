@@ -10,16 +10,10 @@
 <body>
     <div class="container-xxl" >
         <input type="hidden" id="currentRow">
-        <h3>Sổ thu chi (không tính doanh thu bán hàng</h3>
+        <h5>Sổ thu chi (không tính doanh thu bán hàng</h5>
         <br>
         <div class="row">
-            <div class="col-1">
-                <br>
-                <button id="btnThu" type="button" class="btn btn-success">Thu</button>
-                <button id="btnChi" type="button" class="btn btn-danger">Chi</button>
-                <button id="btnNo" type="button" class="btn btn-warning">Nợ</button>
-                <button id="btnAll" type="button" class="btn btn-light">Tất cả</button>
-            </div>
+            <div class="col-1"></div>
             <div class="col-8">
                 <div class=" row col-12">
                     <div class="col-4">Tất cả giao dịch </div>
@@ -30,6 +24,17 @@
                         <span>Đến: <input type="date" id="dateTo" name="dateTo"></span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-1">
+                <button id="btnThu" type="button" class="btn btn-success">Thu</button>
+                <button id="btnChi" type="button" class="btn btn-danger">Chi</button>
+                <button id="btnNo" type="button" class="btn btn-warning">Nợ</button>
+                <button id="btnAll" type="button" class="btn btn-light">Tất cả</button>
+            </div>
+            <div class="col-8 center-scroll bg-light">
                 <div class="bg-light body">
                     <table id= "tbCashFlow" class="table table-hover">
                         <thead>
@@ -46,20 +51,6 @@
                         </tbody>
                     </table>
                 </div>
-                <div class=" row col-12" style="color:red;">
-                    <div id="moneyMethodThuDiv" class="col">Thu:
-                        <span id="moneyMethodThu"></span>
-                    </div>
-                    <div id="moneyMethodChiDiv" class="col">Chi:
-                        <span id="moneyMethodChi"></span>
-                    </div>
-                    <div id="moneyMethodNoDiv" class="col">Nợ:
-                        <span id="moneyMethodNo"></span>
-                    </div>
-                    <div id="moneyMethodAllDiv" class="col text-center">Tổng thu chi:
-                        <span id="moneyMethodAll"></span>
-                    </div>
-                </div>
             </div>
             <div class="col-3">
                 <div class="row col-12 ">
@@ -74,6 +65,25 @@
                 <br>
                 <div class="btn-danger hide errorChoice"></div>
 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-8">
+                <div class=" row col-12" style="color:red;">
+                    <div id="moneyMethodThuDiv" class="col">Thu:
+                        <span id="moneyMethodThu"></span>
+                    </div>
+                    <div id="moneyMethodChiDiv" class="col">Chi:
+                        <span id="moneyMethodChi"></span>
+                    </div>
+                    <div id="moneyMethodNoDiv" class="col">Nợ:
+                        <span id="moneyMethodNo"></span>
+                    </div>
+                    <div id="moneyMethodAllDiv" class="col text-center">Tổng thu chi:
+                        <span id="moneyMethodAll"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

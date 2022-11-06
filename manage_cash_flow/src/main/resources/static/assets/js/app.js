@@ -30,7 +30,7 @@ class App {
         static SUCCESS_DEPOSIT = "Giao dịch gửi tiền thành công !";
         static SUCCESS_WITHDRAW = "Giao dịch rút tiền thành công !";
         static SUCCESS_TRANSFER = "Giao dịch chuyển khoản thành công !";
-        static SUCCESS_DEACTIVATE = "Hủy kích hoạt khách hàng thành công !";
+        static SUCCESS_DEACTIVATE = "Hủy kích hoạt giao dịch thành công !";
 
         static ERROR_400 = "Thao tác không thành công, vui lòng kiểm tra lại dữ liệu.";
         static ERROR_401 = "Unauthorized - Access Token của bạn hết hạn hoặc không hợp lệ.";
@@ -38,9 +38,6 @@ class App {
         static ERROR_404 = "Not Found - Tài nguyên này đã bị xóa hoặc không tồn tại";
         static ERROR_500 = "Internal Server Error - Hệ thống Server đang có vấn đề hoặc không truy cập được.";
 
-        static ERROR_LOADING_PROVINCE = "Tải danh sách tỉnh - thành phố không thành công !";
-        static ERROR_LOADING_DISTRICT = "Tải danh sách quận - phường - huyện không thành công !";
-        static ERROR_LOADING_WARD = "Tải danh sách phường - xã - thị trấn không thành công !";
     }
 
     static SweetAlert = class {
