@@ -13,10 +13,13 @@ import com.cg.util.AppUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,26 +108,58 @@ public class CashFlowRestController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?>createCashFlow(@RequestBody CashFlowStringDTO cashFlowStringDTO) throws ParseException {
+    public ResponseEntity<?>createCashFlow(@Validated @RequestBody CashFlowStringDTO cashFlowStringDTO, BindingResult bindingResult) throws ParseException {
+
+        if(bindingResult.hasFieldErrors()){
+            return appUtil.mapErrorToResponse(bindingResult);
+        }
 
         CashFlowDTO cashFlowDTO = cashFlowStringDTO.toCashFlowDTO();
 
-        cashFlowDTO.setId(0L);
-        CashFlow cashFlow = cashFlowDTO.toCashFlow();
+        Date date = new Date();
+        Date dateTime = cashFlowDTO.getTime();
 
-        CashFlow newCashFlow = cashFlowService.save(cashFlow);
-        return new ResponseEntity<>(newCashFlow.toCashFlowDTO(), HttpStatus.CREATED);
+        if(dateTime.compareTo(date) > 0) {
+            throw new DataInputException("Ngày nhập không được lớn hơn ngày hiện tại");
+        }
+
+        try {
+            cashFlowDTO.setId(0L);
+            CashFlow cashFlow = cashFlowDTO.toCashFlow();
+
+            CashFlow newCashFlow = cashFlowService.save(cashFlow);
+            return new ResponseEntity<>(newCashFlow.toCashFlowDTO(), HttpStatus.CREATED);
+        } catch ( Exception e) {
+            throw new DataInputException("Vui lòng liên hệ Admin");
+        }
+
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?>editCashFlow( @RequestBody CashFlowStringDTO cashFlowStringDTO) throws ParseException {
+    public ResponseEntity<?>editCashFlow(@Validated @RequestBody CashFlowStringDTO cashFlowStringDTO, BindingResult bindingResult) throws ParseException {
 
+        if(bindingResult.hasFieldErrors()){
+            return appUtil.mapErrorToResponse(bindingResult);
+        }
         CashFlowDTO cashFlowDTO = cashFlowStringDTO.toCashFlowDTO();
 
-        CashFlow cashFlow = cashFlowDTO.toCashFlow();
-        CashFlow newCashFlow = cashFlowService.save(cashFlow);
-        cashFlowDTO.setId(newCashFlow.getId());
-        return new ResponseEntity<>(newCashFlow.toCashFlowDTO(), HttpStatus.CREATED);
+        Date date = new Date();
+        Date dateTime = cashFlowDTO.getTime();
+
+        if(dateTime.compareTo(date) > 0) {
+            throw new DataInputException("Ngày nhập không được lớn hơn ngày hiện tại");
+        }
+
+        try {
+            CashFlow cashFlow = cashFlowDTO.toCashFlow();
+            CashFlow newCashFlow = cashFlowService.save(cashFlow);
+            cashFlowDTO.setId(newCashFlow.getId());
+            return new ResponseEntity<>(newCashFlow.toCashFlowDTO(), HttpStatus.CREATED);
+        } catch ( Exception e) {
+            throw new DataInputException("Vui lòng liên hệ Admin");
+        }
+
+
     }
 
     @DeleteMapping("/suspend/{cashFlowId}")

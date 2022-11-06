@@ -20,12 +20,13 @@ public class CashFlow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss Z", timezone = "Asia/Ho_Chi_Minh")
     private Date time;
 
     @Column(precision = 12, scale = 0, nullable = false, updatable = false)
     private BigDecimal amountMoney;
-
+    @Column(nullable = false)
     private String description;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")

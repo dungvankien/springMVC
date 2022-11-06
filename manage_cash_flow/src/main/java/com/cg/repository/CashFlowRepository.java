@@ -1,7 +1,6 @@
 package com.cg.repository;
 
 import com.cg.model.CashFlow;
-import com.cg.model.Method;
 import com.cg.model.dto.CashFlowDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

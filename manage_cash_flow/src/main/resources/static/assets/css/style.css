@@ -52,3 +52,6 @@
     table td span.selected {
         border-left-color: #5cb85c;
     }
+    .error{
+        color: red;
+    }

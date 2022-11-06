@@ -1,11 +1,9 @@
 package com.cg.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,15 +14,14 @@ import java.util.Date;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CashFlowStringDTO {
+public class CashFlowStringDTO  {
     private Long id;
-
     private String time;
 
     private MethodDTO method;
 
     private BigDecimal amountMoney;
-
+    @Size(min = 2, message = "Diễn giải lớn hơn 2 ký tự")
     private String description;
 
     private CategoryDTO category;

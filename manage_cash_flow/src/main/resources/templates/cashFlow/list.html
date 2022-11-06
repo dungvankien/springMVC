@@ -70,6 +70,10 @@
                 <th:block th:replace="/cashFlow/formCreate :: formCreate" />
                 <th:block th:replace="/cashFlow/formEdit :: formEdit" />
                 <th:block th:replace="/cashFlow/formSuspend :: formSuspend" />
+                <br>
+                <br>
+                <div class="btn-danger hide errorChoice"></div>
+
             </div>
         </div>
     </div>
@@ -364,7 +368,8 @@
                 url: page.urls.getMoneyMethod + "/" + "getMoneyThu"
             })
             .done((data) => {
-                page.dialogs.elements.moneyMethodThu.html(data);
+                let str = `${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(data)}`;
+                page.dialogs.elements.moneyMethodThu.html(str);
             })
             .fail((jqXHR) => {
                 App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500);
@@ -381,7 +386,8 @@
                 url: page.urls.getMoneyMethod + "/" + "getMoneyChi"
             })
             .done((data) => {
-                page.dialogs.elements.moneyMethodChi.html(data);
+                let str = `${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(data)}`;
+                page.dialogs.elements.moneyMethodChi.html(str);
             })
             .fail((jqXHR) => {
                 App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500);
@@ -398,7 +404,8 @@
                 url: page.urls.getMoneyMethod + "/" + "getMoneyAll"
             })
                 .done((data) => {
-                    page.dialogs.elements.moneyMethodAll.html(data);
+                    let str = `${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(data)}`;
+                    page.dialogs.elements.moneyMethodAll.html(str);
                 })
                 .fail((jqXHR) => {
                     App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500);
@@ -415,7 +422,8 @@
                 url: page.urls.getMoneyMethod + "/" + "getMoneyNo"
             })
             .done((data) => {
-                page.dialogs.elements.moneyMethodNo.html(data);
+                let str = `${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(data)}`;
+                page.dialogs.elements.moneyMethodNo.html(str);
             })
             .fail((jqXHR) => {
                 App.IziToast.showErrorAlert(App.AlertMessageVi.ERROR_500);
@@ -446,12 +454,14 @@
             page.dialogs.elements.frmCreate[0].reset();
             page.dialogs.elements.frmCreate.validate().resetForm();
             page.elements.showCreate.hide();
+            $(".errorChoice").empty();
         })
 
         page.dialogs.elements.btnExitEdit.on("click", () => {
             page.dialogs.elements.frmEdit[0].reset();
             page.dialogs.elements.frmEdit.validate().resetForm();
             page.elements.showEdit.hide();
+            $(".errorChoice").empty();
         })
 
         page.dialogs.elements.btnExitSuspend.on("click", () => {
@@ -496,13 +506,27 @@
                 }
                 page.commands.handleSelectTr();
                 App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_CREATED);
+                $(".errorChoice").empty();
                 page.commands.getMoneyThu();
                 page.commands.getMoneyChi();
                 page.commands.getMoneyAll();
                 page.commands.getMoneyNo();
             })
             .fail((jqXHR) => {
-                App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
+
+                $(".errorChoice").empty();
+                let str ="";
+                let message = jqXHR.responseJSON.message;
+                if(message){
+                    str += `<label id="mesaageCreate-error" class="error" for="mesaageCreat">${message}</label>`;
+                }
+                else {
+                    let errors = jqXHR.responseJSON;
+                    $.each(errors, (key, value) => {
+                        str +=`<lable id="${key}Create-error" class="error" for="${key}Create">${value}</lable>`;
+                    })
+                }
+                $(".errorChoice").append(str).removeClass("hide").addClass("show");
             })
         }
 
@@ -510,7 +534,7 @@
             page.elements.btnShowUpdate.on("click", () => {
                 let cashFlowId = page.elements.currentRow.val();
                 page.commands.getCashFlowById(cashFlowId).then(() => {
-                    page.dialogs.elements.dateEdit.val(cashFlow.time);
+                    page.dialogs.elements.dateEdit.val(new Date(cashFlow.time).toString().slice(0, 10));
                     page.dialogs.elements.descriptionEdit.val(cashFlow.description);
                     page.dialogs.elements.moneyEdit.val(cashFlow.amountMoney);
                     page.dialogs.elements.categoryEdit.val(cashFlow.category.id);
@@ -596,6 +620,7 @@
                     }
                     App.IziToast.showSuccessAlert(App.AlertMessageVi.SUCCESS_UPDATED);
                     page.elements.showEdit.hide();
+                    $(".errorChoice").empty();
                     page.commands.handleSelectTr();
                     page.commands.getMoneyThu();
                     page.commands.getMoneyChi();
@@ -603,7 +628,19 @@
                     page.commands.getMoneyNo();
                 })
                 .fail((jqXHR) => {
-                    App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
+                    $(".errorChoice").empty();
+                    let str ="";
+                    let message = jqXHR.responseJSON.message;
+                    if(message){
+                        str += `<label id="mesaageEdit-error" class="error" for="mesaageEdit">${message}</label>`;
+                    }
+                    else {
+                        let errors = jqXHR.responseJSON;
+                        $.each(errors, (key, value) => {
+                            str +=`<lable id="${key}Edit-error" class="error" for="${key}Edit">${value}</lable>`;
+                        })
+                    }
+                    $(".errorChoice").append(str).removeClass("hide").addClass("show");
                 })
         }
 
@@ -624,6 +661,7 @@
                     page.commands.getMoneyChi();
                     page.commands.getMoneyAll();
                     page.commands.getMoneyNo();
+
                 })
                 .fail((jqXHR) => {
                     App.IziToast.showErrorAlert((App.AlertMessageVi.ERROR_400));
@@ -634,17 +672,46 @@
             rules: {
                 descriptionCreate: {
                     required: true,
-                    minlength: 5,
-                    maxlength: 35
+                    minlength: 2,
+                    maxlength: 50
+                },
+                moneyCreate: {
+                    required: true,
+                    min: 1000
+                },
+                dateCreate: {
+                    required: true
                 }
             },
             messages: {
                 descriptionCreate: {
-                    required: "Vui lòng nhập tên đầy đủ",
-                    minlength: "Họ tên tối thiểu 5 ký tự",
-                    maxlength: "Họ tên tối đa 35 ký tự"
+                    required: "Vui lòng ghi nội dung",
+                    minlength: "Nhập tối thiểu 2 ký tự",
+                    maxlength: "Nhập tối đa 50 ký tự"
+                },
+                moneyCreate: {
+                    required: "Vui lòng nhập số tiền",
+                    min: "Giá trị lớn hơn 1000vnd"
+                },
+                dateCreate: {
+                    required: "Ngày không được để trống"
                 }
             },
+
+            // errorLabelContainer: ".errorChoice",
+            // errorPlacement: function (error, element) {
+            //     error.appendTo(".errorChoice");
+            // },
+            // showErrors: function(errorMap, errorList) {
+            //     if (this.numberOfInvalids() > 0) {
+            //         $(".errorChoice").removeClass("hide").addClass("show");
+            //     } else {
+            //         $(".errorChoice").removeClass("show").addClass("hide").empty();
+            //         $("#frmCreate input.error").removeClass("error");
+            //     }
+            //     this.defaultShowErrors();
+            // },
+
             submitHandler: function () {
                 page.commands.createCashFlow();
             }
@@ -654,15 +721,29 @@
             rules: {
                 descriptionEdit: {
                     required: true,
-                    minlength: 5,
-                    maxlength: 35
+                    minlength: 2,
+                    maxlength: 50
+                },
+                moneyEdit: {
+                    required: true,
+                    min: 1000
+                },
+                dateEdit: {
+                    required: true
                 }
             },
             messages: {
                 descriptionEdit: {
                     required: "Vui lòng nhập tên đầy đủ",
-                    minlength: "Họ tên tối thiểu 5 ký tự",
-                    maxlength: "Họ tên tối đa 35 ký tự"
+                    minlength: "Họ tên tối thiểu 2 ký tự",
+                    maxlength: "Họ tên tối đa 50 ký tự"
+                },
+                moneyEdit: {
+                    required: "Vui lòng nhập số tiền",
+                    min: "Giá trị lớn hơn 1000vnd"
+                },
+                dateEdit: {
+                    required: "Ngày không được để trống"
                 }
             },
             submitHandler: function () {
