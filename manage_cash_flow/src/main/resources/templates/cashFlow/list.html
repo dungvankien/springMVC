@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/assets/bootstrap/v5.2.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/izitoast/v1.4.0/iziToast-1.4.0.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/jquery/jquery.datetimepicker.min.css">
 </head>
 <body>
     <div class="container-xxl" >
@@ -18,10 +19,10 @@
                 <div class=" row col-12">
                     <div class="col-4">Tất cả giao dịch </div>
                     <div class="btn col-4">
-                        <span>Từ: <input type="date" id="dateFrom" name="dateFrom" ></span>
+                        <span>Từ: <input type="text" id="date_timepicker_start" name="dateFrom" placeholder="yyyy/MM/dd"></span>
                     </div>
                     <div class="btn col-4">
-                        <span>Đến: <input type="date" id="dateTo" name="dateTo"></span>
+                        <span>Đến: <input type="text" id="date_timepicker_end" name="dateTo" placeholder="yyyy/MM/dd"></span>
                     </div>
                 </div>
             </div>
@@ -40,11 +41,11 @@
                         <thead>
                         <tr>
                             <th scope="col"></th>
-                            <th scope="col">Thời điểm</th>
-                            <th scope="col">Thể loại</th>
-                            <th scope="col">Diễn giải</th>
-                            <th scope="col">Số tiền</th>
-                            <th scope="col">Người ghi</th>
+                            <th scope="col" >Thời điểm</th>
+                            <th scope="col" >Thể loại</th>
+                            <th scope="col" >Diễn giải</th>
+                            <th scope="col" >Số tiền</th>
+                            <th scope="col" >Người ghi</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -93,6 +94,7 @@
     <script src="/assets/jquery/jquery-v3.6.0.min.js"></script>
     <script src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
     <script src="/assets/js/app.js"></script>
+    <script src="/assets/jquery/jquery.datetimepicker.full.min.js"></script>
 
     <script>
 
@@ -544,7 +546,7 @@
             page.elements.btnShowUpdate.on("click", () => {
                 let cashFlowId = page.elements.currentRow.val();
                 page.commands.getCashFlowById(cashFlowId).then(() => {
-                    page.dialogs.elements.dateEdit.val(new Date(cashFlow.time).toString().slice(0, 10));
+                    page.dialogs.elements.dateEdit.val(new Date(cashFlow.time).toISOString().slice(0, 16));
                     page.dialogs.elements.descriptionEdit.val(cashFlow.description);
                     page.dialogs.elements.moneyEdit.val(cashFlow.amountMoney);
                     page.dialogs.elements.categoryEdit.val(cashFlow.category.id);
@@ -564,7 +566,7 @@
             page.elements.btnShowDelete.on("click", () => {
                 let cashFlowId = page.elements.currentRow.val();
                 page.commands.getCashFlowById(cashFlowId).then(() => {
-                    page.dialogs.elements.dateSuspend.val(cashFlow.time);
+                    page.dialogs.elements.dateSuspend.val(new Date(cashFlow.time).toISOString().slice(0, 16));
                     page.dialogs.elements.descriptionSuspend.val(cashFlow.description);
                     page.dialogs.elements.moneySuspend.val(cashFlow.amountMoney);
                     page.dialogs.elements.categorySuspend.val(cashFlow.category.id);
@@ -776,6 +778,29 @@
         page.elements.showEdit.hide();
         page.elements.showCreate.hide();
         page.elements.showSuspend.hide();
+    </script>
+
+    <script>
+        jQuery(function () {
+            jQuery('#date_timepicker_start').datetimepicker({
+                format: 'Y/m/d',
+                onShow: function (ct) {
+                    this.setOptions({
+                        maxDate: jQuery('#date_timepicker_end').val() ? jQuery('#date_timepicker_end').val() : false
+                    })
+                },
+                timepicker: false
+            });
+            jQuery('#date_timepicker_end').datetimepicker({
+                format: 'Y/m/d',
+                onShow: function (ct) {
+                    this.setOptions({
+                        minDate: jQuery('#date_timepicker_start').val() ? jQuery('#date_timepicker_start').val() : false
+                    })
+                },
+                timepicker: false
+            });
+        });
     </script>
 </body>
 </html>

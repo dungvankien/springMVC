@@ -100,7 +100,7 @@ class App {
             <td>
                 <span class="select-tab unselected"></span>
             </td>
-            <td>${new Date(obj.time).toLocaleDateString('vi-VN').slice(0, 10)}</td>
+            <td>${(obj.time).slice(0, 16)}</td>
             <td>${obj.category.nameCategory}</td>
             <td>${obj.description}</td>
             <td>

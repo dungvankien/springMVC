@@ -30,7 +30,7 @@ public class CashFlowStringDTO  {
 
     public CashFlowDTO toCashFlowDTO() throws ParseException {
 
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(time);
+        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(time);
 
         return new CashFlowDTO()
                 .setId(id)
